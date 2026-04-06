@@ -9,6 +9,8 @@ import Dashboard           from "./pages/Dashboard";
 import Listings            from "./pages/Listings";
 import Bookings            from "./pages/Bookings";
 import AdminDashboard      from "./pages/AdminDashboard";
+import ListingDetail       from "./pages/ListingDetail";
+import Payment             from "./pages/Payment";
 
 function App() {
   return (
@@ -19,10 +21,12 @@ function App() {
           <Navbar />
 
           <Routes>
+
             {/* Public routes */}
-            <Route path="/login"    element={<Login />}    />
-            <Route path="/register" element={<Register />} />
-            <Route path="/listings" element={<Listings />} />
+            <Route path="/login"         element={<Login />}    />
+            <Route path="/register"      element={<Register />} />
+            <Route path="/listings"      element={<Listings />} />
+            <Route path="/listings/:id"  element={<ListingDetail />} />
 
             {/* Customer protected routes */}
             <Route
@@ -41,6 +45,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/payment/:bookingId"
+              element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin only route */}
             <Route
@@ -55,6 +67,7 @@ function App() {
             {/* Default redirects */}
             <Route path="/"  element={<Navigate to="/listings" replace />} />
             <Route path="*"  element={<Navigate to="/listings" replace />} />
+
           </Routes>
         </div>
       </BrowserRouter>
