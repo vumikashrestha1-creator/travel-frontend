@@ -56,9 +56,9 @@ const Register = () => {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">✈️</div>
-          <h1 className="text-3xl font-bold text-blue-900">Create Account</h1>
-          <p className="text-gray-500 mt-2">Join SecureTravel today</p>
+          <div className="text-5xl mb-4">🏠</div>
+            <h1 className="text-3xl font-bold text-teal-800">SafeNest Travel</h1>
+            <p className="text-gray-500 mt-2">Join SafeNest Travel today</p>
         </div>
 
         {/* General error */}

@@ -11,23 +11,24 @@ const AdminDashboard = () => {
   const [message,     setMessage]     = useState("");
   const [showForm,    setShowForm]    = useState(false);
   const [newListing,  setNewListing]  = useState({
-    title:           "",
-    description:     "",
-    listing_type:    "PACKAGE",
-    origin:          "",
-    destination:     "",
-    country:         "",
-    city:            "",
-    price_per_person:"",
-    discount_percent:"0",
-    available_seats: "",
-    max_seats:       "",
-    start_date:      "",
-    end_date:        "",
-    duration_days:   "",
-    includes_hotel:  false,
-    includes_flight: false,
-    includes_meals:  false,
+    title:            "",
+    description:      "",
+    listing_type:     "PACKAGE",
+    origin:           "",
+    destination:      "",
+    country:          "",
+    city:             "",
+    price_per_person: "",
+    discount_percent: "0",
+    available_seats:  "",
+    max_seats:        "",
+    start_date:       "",
+    end_date:         "",
+    duration_days:    "",
+    image_url:        "",
+    includes_hotel:   false,
+    includes_flight:  false,
+    includes_meals:   false,
   });
 
   useEffect(() => {
@@ -89,6 +90,26 @@ const AdminDashboard = () => {
       await api.post("/api/listings/create/", newListing);
       setMessage("Listing created successfully.");
       setShowForm(false);
+      setNewListing({
+        title:            "",
+        description:      "",
+        listing_type:     "PACKAGE",
+        origin:           "",
+        destination:      "",
+        country:          "",
+        city:             "",
+        price_per_person: "",
+        discount_percent: "0",
+        available_seats:  "",
+        max_seats:        "",
+        start_date:       "",
+        end_date:         "",
+        duration_days:    "",
+        image_url:        "",
+        includes_hotel:   false,
+        includes_flight:  false,
+        includes_meals:   false,
+      });
       fetchData();
     } catch (error) {
       setMessage(
@@ -113,7 +134,7 @@ const AdminDashboard = () => {
   const tabClass = (tab) =>
     `px-6 py-3 font-medium text-sm transition-colors cursor-pointer ${
       activeTab === tab
-        ? "border-b-2 border-blue-600 text-blue-600"
+        ? "border-b-2 border-teal-600 text-teal-600"
         : "text-gray-500 hover:text-gray-700"
     }`;
 
@@ -127,7 +148,9 @@ const AdminDashboard = () => {
       INACTIVE:  "bg-gray-100 text-gray-700",
       SOLDOUT:   "bg-red-100 text-red-700",
     };
-    return `px-2 py-1 rounded-full text-xs font-medium ${styles[status] || "bg-gray-100 text-gray-700"}`;
+    return `px-2 py-1 rounded-full text-xs font-medium ${
+      styles[status] || "bg-gray-100 text-gray-700"
+    }`;
   };
 
   return (
@@ -135,10 +158,12 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-2xl p-8 text-white mb-8">
-          <h1 className="text-3xl font-bold mb-1">Admin Dashboard 🛡️</h1>
-          <p className="text-blue-200">
-            Full system control and management
+        <div className="bg-gradient-to-r from-teal-800 to-teal-600 rounded-2xl p-8 text-white mb-8">
+          <h1 className="text-3xl font-bold mb-1">
+            Admin Dashboard 🛡️
+          </h1>
+          <p className="text-teal-200">
+            SafeNest Travel — Full system control and management
           </p>
         </div>
 
@@ -146,7 +171,8 @@ const AdminDashboard = () => {
         {message && (
           <div
             className={`mb-6 px-4 py-3 rounded-lg ${
-              message.includes("successfully") || message.includes("created")
+              message.includes("successfully") ||
+              message.includes("created")
                 ? "bg-green-50 border border-green-200 text-green-700"
                 : "bg-red-50 border border-red-200 text-red-700"
             }`}
@@ -183,13 +209,12 @@ const AdminDashboard = () => {
           <div className="p-6">
             {loading ? (
               <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
                 <p className="text-gray-500">Loading data...</p>
               </div>
             ) : (
-
               <>
-                {/* ── OVERVIEW TAB ─────────────────────────── */}
+                {/* ── OVERVIEW TAB ─────────────────────── */}
                 {activeTab === "overview" && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-6">
@@ -197,11 +222,11 @@ const AdminDashboard = () => {
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                       {[
-                        { label:"Total Users",    value:users.length,    icon:"👥", color:"blue"   },
-                        { label:"Total Bookings", value:bookings.length, icon:"📋", color:"green"  },
-                        { label:"Total Listings", value:listings.length, icon:"🌍", color:"purple" },
-                        { label:"Total Payments", value:payments.length, icon:"💳", color:"orange" },
-                      ].map(({ label, value, icon, color }) => (
+                        { label:"Total Users",    value:users.length,    icon:"👥" },
+                        { label:"Total Bookings", value:bookings.length, icon:"📋" },
+                        { label:"Total Listings", value:listings.length, icon:"🌍" },
+                        { label:"Total Payments", value:payments.length, icon:"💳" },
+                      ].map(({ label, value, icon }) => (
                         <div
                           key={label}
                           className="bg-gray-50 rounded-xl p-5 border border-gray-100"
@@ -215,7 +240,7 @@ const AdminDashboard = () => {
                       ))}
                     </div>
 
-                    {/* Recent bookings preview */}
+                    {/* Recent bookings */}
                     <h3 className="text-md font-semibold text-gray-700 mb-3">
                       Recent Bookings
                     </h3>
@@ -234,7 +259,7 @@ const AdminDashboard = () => {
                           <span className={statusBadge(b.status)}>
                             {b.status}
                           </span>
-                          <span className="font-semibold text-blue-900">
+                          <span className="font-semibold text-teal-700">
                             ${b.total_price}
                           </span>
                         </div>
@@ -243,7 +268,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* ── USERS TAB ────────────────────────────── */}
+                {/* ── USERS TAB ──────────────────────────── */}
                 {activeTab === "users" && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -253,12 +278,24 @@ const AdminDashboard = () => {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-gray-50 text-left">
-                            <th className="px-4 py-3 font-medium text-gray-600">Email</th>
-                            <th className="px-4 py-3 font-medium text-gray-600">Name</th>
-                            <th className="px-4 py-3 font-medium text-gray-600">Role</th>
-                            <th className="px-4 py-3 font-medium text-gray-600">Status</th>
-                            <th className="px-4 py-3 font-medium text-gray-600">Joined</th>
-                            <th className="px-4 py-3 font-medium text-gray-600">Action</th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Email
+                            </th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Name
+                            </th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Role
+                            </th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Status
+                            </th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Joined
+                            </th>
+                            <th className="px-4 py-3 font-medium text-gray-600">
+                              Action
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -271,37 +308,46 @@ const AdminDashboard = () => {
                                 {user.first_name} {user.last_name}
                               </td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  user.role === "ADMIN"
-                                    ? "bg-blue-100 text-blue-700"
-                                    : user.role === "TRAVEL_AGENT"
-                                    ? "bg-purple-100 text-purple-700"
-                                    : "bg-green-100 text-green-700"
-                                }`}>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    user.role === "ADMIN"
+                                      ? "bg-blue-100 text-blue-700"
+                                      : user.role === "TRAVEL_AGENT"
+                                      ? "bg-purple-100 text-purple-700"
+                                      : "bg-green-100 text-green-700"
+                                  }`}
+                                >
                                   {user.role}
                                 </span>
                               </td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  user.is_active
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    user.is_active
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-red-100 text-red-700"
+                                  }`}
+                                >
                                   {user.is_active ? "Active" : "Inactive"}
                                 </span>
                               </td>
                               <td className="px-4 py-3 text-gray-500">
-                                {new Date(user.date_joined).toLocaleDateString()}
+                                {new Date(
+                                  user.date_joined
+                                ).toLocaleDateString()}
                               </td>
                               <td className="px-4 py-3">
-                                {user.is_active && user.role !== "ADMIN" && (
-                                  <button
-                                    onClick={() => handleDeactivateUser(user.id)}
-                                    className="text-red-600 hover:text-red-800 text-xs font-medium"
-                                  >
-                                    Deactivate
-                                  </button>
-                                )}
+                                {user.is_active &&
+                                  user.role !== "ADMIN" && (
+                                    <button
+                                      onClick={() =>
+                                        handleDeactivateUser(user.id)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-xs font-medium"
+                                    >
+                                      Deactivate
+                                    </button>
+                                  )}
                               </td>
                             </tr>
                           ))}
@@ -311,7 +357,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* ── BOOKINGS TAB ─────────────────────────── */}
+                {/* ── BOOKINGS TAB ────────────────────────── */}
                 {activeTab === "bookings" && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -337,18 +383,19 @@ const AdminDashboard = () => {
                                 <span>👤 {booking.user_email}</span>
                                 <span>🔖 {booking.booking_reference}</span>
                                 <span>👥 {booking.number_of_guests} guests</span>
-                                <span className="font-semibold text-blue-900">
+                                <span className="font-semibold text-teal-700">
                                   💰 ${booking.total_price}
                                 </span>
                               </div>
                             </div>
-
-                            {/* Status update */}
                             <div className="flex items-center gap-2">
                               <select
                                 defaultValue={booking.status}
                                 onChange={(e) =>
-                                  handleUpdateBooking(booking.id, e.target.value)
+                                  handleUpdateBooking(
+                                    booking.id,
+                                    e.target.value
+                                  )
                                 }
                                 className="text-sm border border-gray-200 rounded-lg px-2 py-1 outline-none"
                               >
@@ -365,7 +412,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* ── LISTINGS TAB ─────────────────────────── */}
+                {/* ── LISTINGS TAB ────────────────────────── */}
                 {activeTab === "listings" && (
                   <div>
                     <div className="flex justify-between items-center mb-4">
@@ -374,7 +421,7 @@ const AdminDashboard = () => {
                       </h2>
                       <button
                         onClick={() => setShowForm(!showForm)}
-                        className="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition-colors"
+                        className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors"
                       >
                         {showForm ? "Cancel" : "+ Add Listing"}
                       </button>
@@ -391,17 +438,18 @@ const AdminDashboard = () => {
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {[
-                            { name:"title",           label:"Title",           type:"text"   },
-                            { name:"origin",          label:"Origin",          type:"text"   },
-                            { name:"destination",     label:"Destination",     type:"text"   },
-                            { name:"country",         label:"Country",         type:"text"   },
-                            { name:"city",            label:"City",            type:"text"   },
-                            { name:"price_per_person",label:"Price/Person",    type:"number" },
-                            { name:"available_seats", label:"Available Seats", type:"number" },
-                            { name:"max_seats",       label:"Max Seats",       type:"number" },
-                            { name:"duration_days",   label:"Duration (days)", type:"number" },
-                            { name:"start_date",      label:"Start Date",      type:"date"   },
-                            { name:"end_date",        label:"End Date",        type:"date"   },
+                            { name:"title",            label:"Title",              type:"text"   },
+                            { name:"origin",           label:"Origin",             type:"text"   },
+                            { name:"destination",      label:"Destination",        type:"text"   },
+                            { name:"country",          label:"Country",            type:"text"   },
+                            { name:"city",             label:"City",               type:"text"   },
+                            { name:"price_per_person", label:"Price Per Person",   type:"number" },
+                            { name:"discount_percent", label:"Discount %",         type:"number" },
+                            { name:"available_seats",  label:"Available Seats",    type:"number" },
+                            { name:"max_seats",        label:"Max Seats",          type:"number" },
+                            { name:"duration_days",    label:"Duration (days)",    type:"number" },
+                            { name:"start_date",       label:"Start Date",         type:"date"   },
+                            { name:"end_date",         label:"End Date",           type:"date"   },
                           ].map(({ name, label, type }) => (
                             <div key={name}>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -417,10 +465,45 @@ const AdminDashboard = () => {
                                     [name]: e.target.value,
                                   })
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
                               />
                             </div>
                           ))}
+
+                          {/* Image URL field */}
+                          <div className="sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Image URL
+                              <span className="text-gray-400 font-normal ml-1">
+                                (optional — paste a photo link)
+                              </span>
+                            </label>
+                            <input
+                              type="url"
+                              value={newListing.image_url}
+                              onChange={(e) =>
+                                setNewListing({
+                                  ...newListing,
+                                  image_url: e.target.value,
+                                })
+                              }
+                              placeholder="https://images.unsplash.com/photo-..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
+                            />
+                            {/* Image preview */}
+                            {newListing.image_url && (
+                              <div className="mt-2">
+                                <img
+                                  src={newListing.image_url}
+                                  alt="Preview"
+                                  className="h-24 w-40 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    e.target.style.display = "none";
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
 
                           {/* Description */}
                           <div className="sm:col-span-2">
@@ -437,14 +520,14 @@ const AdminDashboard = () => {
                                 })
                               }
                               rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
                             />
                           </div>
 
                           {/* Type */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Type
+                              Listing Type
                             </label>
                             <select
                               value={newListing.listing_type}
@@ -462,7 +545,7 @@ const AdminDashboard = () => {
                             </select>
                           </div>
 
-                          {/* Includes checkboxes */}
+                          {/* Checkboxes */}
                           <div className="flex items-center gap-6 pt-6">
                             {[
                               { name:"includes_hotel",  label:"Hotel"  },
@@ -482,7 +565,7 @@ const AdminDashboard = () => {
                                       [name]: e.target.checked,
                                     })
                                   }
-                                  className="w-4 h-4"
+                                  className="w-4 h-4 accent-teal-600"
                                 />
                                 {label}
                               </label>
@@ -492,7 +575,7 @@ const AdminDashboard = () => {
 
                         <button
                           type="submit"
-                          className="mt-4 bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                          className="mt-6 bg-teal-700 text-white px-6 py-2 rounded-lg hover:bg-teal-800 transition-colors font-medium"
                         >
                           Create Listing
                         </button>
@@ -506,27 +589,54 @@ const AdminDashboard = () => {
                           key={listing.id}
                           className="border border-gray-100 rounded-xl p-4 flex flex-col sm:flex-row justify-between gap-3"
                         >
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-gray-800">
-                                {listing.title}
-                              </span>
-                              <span className={statusBadge(listing.status)}>
-                                {listing.status}
-                              </span>
-                            </div>
-                            <div className="text-sm text-gray-500 flex gap-4">
-                              <span>📍 {listing.destination}</span>
-                              <span>💰 ${listing.discounted_price}/person</span>
-                              <span>💺 {listing.available_seats} seats</span>
+                          <div className="flex gap-4 items-start">
+                            {/* Listing thumbnail */}
+                            {listing.image_url ? (
+                              <img
+                                src={listing.image_url}
+                                alt={listing.title}
+                                className="w-16 h-16 object-cover rounded-lg shrink-0"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <span className="text-2xl">
+                                  {listing.listing_type === "HOTEL"
+                                    ? "🏨"
+                                    : listing.listing_type === "FLIGHT"
+                                    ? "✈️"
+                                    : "🌴"}
+                                </span>
+                              </div>
+                            )}
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-semibold text-gray-800">
+                                  {listing.title}
+                                </span>
+                                <span className={statusBadge(listing.status)}>
+                                  {listing.status}
+                                </span>
+                              </div>
+                              <div className="text-sm text-gray-500 flex flex-wrap gap-3">
+                                <span>📍 {listing.destination}</span>
+                                <span>
+                                  💰 ${listing.discounted_price}/person
+                                </span>
+                                <span>💺 {listing.available_seats} seats</span>
+                              </div>
                             </div>
                           </div>
+
                           {listing.status === "ACTIVE" && (
                             <button
                               onClick={() =>
                                 handleDeactivateListing(listing.id)
                               }
-                              className="text-red-600 hover:text-red-800 text-sm font-medium self-start"
+                              className="text-red-600 hover:text-red-800 text-sm font-medium self-start shrink-0"
                             >
                               Deactivate
                             </button>

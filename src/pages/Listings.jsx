@@ -128,14 +128,47 @@ const Listings = () => {
                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
               >
                 {/* Card image */}
-                <div className="bg-gradient-to-br from-blue-500 to-blue-700 h-40 flex items-center justify-center">
-                  <span className="text-5xl">
+                
+                <div className="relative h-48 overflow-hidden">
+                {listing.image_url ? (
+                    <img
+                    src={listing.image_url}
+                    alt={listing.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                    }}
+                    />
+                ) : null}
+                <div
+                    className="bg-gradient-to-br from-teal-500 to-teal-700 h-full w-full items-center justify-center"
+                    style={{ display: listing.image_url ? "none" : "flex" }}
+                >
+                    <span className="text-5xl">
                     {listing.listing_type === "HOTEL"
-                      ? "🏨"
-                      : listing.listing_type === "FLIGHT"
-                      ? "✈️"
-                      : "🌴"}
-                  </span>
+                        ? "🏨"
+                        : listing.listing_type === "FLIGHT"
+                        ? "✈️"
+                        : "🌴"}
+                    </span>
+                </div>
+
+                {/* Type badge overlay on image */}
+                <div className="absolute top-3 left-3">
+                    <span className="bg-white bg-opacity-90 text-teal-800 text-xs px-2 py-1 rounded-full font-semibold shadow">
+                    {listing.listing_type}
+                    </span>
+                </div>
+
+                {/* Discount badge */}
+                {listing.discount_percent > 0 && (
+                    <div className="absolute top-3 right-3">
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow">
+                        {listing.discount_percent}% OFF
+                    </span>
+                    </div>
+                )}
                 </div>
 
                 {/* Card content */}
@@ -144,9 +177,7 @@ const Listings = () => {
                     <h3 className="font-bold text-gray-800 text-lg leading-tight">
                       {listing.title}
                     </h3>
-                    <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full ml-2 shrink-0">
-                      {listing.listing_type}
-                    </span>
+                   
                   </div>
 
                   <p className="text-gray-500 text-sm mb-3">

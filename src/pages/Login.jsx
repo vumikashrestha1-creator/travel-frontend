@@ -46,14 +46,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-teal-800 via-teal-700 to-teal-900 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">✈️</div>
-          <h1 className="text-3xl font-bold text-blue-900">Welcome Back</h1>
-          <p className="text-gray-500 mt-2">Sign in to your account</p>
+         <div className="text-5xl mb-4">🏠</div>
+         <h1 className="text-3xl font-bold text-teal-800">SafeNest Travel</h1>
+         <p className="text-gray-500 mt-2">Sign in to your account</p>
         </div>
 
         {/* Error message */}
@@ -98,7 +98,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-900 hover:bg-blue-800 disabled:bg-blue-300 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+            className="w-full bg-teal-700 hover:bg-teal-800 disabled:bg-blue-300 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
