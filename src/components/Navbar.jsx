@@ -35,8 +35,9 @@ const Navbar = () => {
           <div className="flex items-center space-x-6">
             <Link
               to="/listings"
+              onClick={() => window.location.href = "/listings"}
               className="hover:text-teal-200 transition-colors duration-200 text-sm font-medium"
-            >
+>
               Browse Packages
             </Link>
 
