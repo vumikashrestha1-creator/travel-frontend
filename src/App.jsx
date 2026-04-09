@@ -11,6 +11,7 @@ import Bookings            from "./pages/Bookings";
 import AdminDashboard      from "./pages/AdminDashboard";
 import ListingDetail       from "./pages/ListingDetail";
 import Payment             from "./pages/Payment";
+import Home                from "./pages/Home";
 
 function App() {
   return (
@@ -65,7 +66,7 @@ function App() {
             />
 
             {/* Default redirects */}
-            <Route path="/"  element={<Navigate to="/listings" replace />} />
+            <Route path="/"  element={<Home />} />
             <Route path="*"  element={<Navigate to="/listings" replace />} />
 
           </Routes>
