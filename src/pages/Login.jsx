@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error,    setError]    = useState("");
-  const [loading,  setLoading]  = useState(false);
+  const [formData, setFormData] = useState({
+    email:    "",
+    password: "",
+  });
+  const [error,   setError]   = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate  = useNavigate();
@@ -21,24 +24,68 @@ const Login = () => {
     setError("");
 
     try {
-      const user = await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password);
 
-      // Redirect based on role
-      if (user.role === "ADMIN") {
+      // MFA required — go to OTP screen
+      if (result.mfa_required) {
+        navigate("/verify-otp", {
+          state: {
+            user_id:  result.user_id,
+            email:    result.email,
+            mfa_type: result.mfa_type,
+          },
+        });
+        return;
+      }
+
+      // No MFA — redirect by role
+      if (result.user.role === "ADMIN") {
         navigate("/admin-dashboard");
       } else {
         navigate("/dashboard");
       }
+
     } catch (err) {
-      const errorData = err.response?.data;
-      if (errorData?.email) {
-        setError(errorData.email[0]);
-      } else if (errorData?.password) {
-        setError(errorData.password[0]);
-      } else if (errorData?.account) {
-        setError(errorData.account[0]);
+      const data = err.response?.data;
+
+      if (!data) {
+        setError("Cannot connect to server. Please try again.");
+        return;
+      }
+
+      // Handle all possible error formats from DRF
+      if (Array.isArray(data)) {
+        setError(data[0]);
+      } else if (typeof data === "string") {
+        setError(data);
+      } else if (data.non_field_errors) {
+        setError(
+          Array.isArray(data.non_field_errors)
+            ? data.non_field_errors[0]
+            : data.non_field_errors
+        );
+      } else if (data.detail) {
+        setError(data.detail);
+      } else if (data.email) {
+        setError(
+          Array.isArray(data.email)
+            ? data.email[0]
+            : data.email
+        );
+      } else if (data.password) {
+        setError(
+          Array.isArray(data.password)
+            ? data.password[0]
+            : data.password
+        );
+      } else if (data.account) {
+        setError(
+          Array.isArray(data.account)
+            ? data.account[0]
+            : data.account
+        );
       } else {
-        setError("Login failed. Please try again.");
+        setError("Login failed. Please check your credentials.");
       }
     } finally {
       setLoading(false);
@@ -51,14 +98,18 @@ const Login = () => {
 
         {/* Header */}
         <div className="text-center mb-8">
-         <div className="text-5xl mb-4">🏠</div>
-         <h1 className="text-3xl font-bold text-teal-800">SafeNest Travel</h1>
-         <p className="text-gray-500 mt-2">Sign in to your account</p>
+          <div className="text-5xl mb-4">🏠</div>
+          <h1 className="text-3xl font-bold text-teal-800">
+            SafeNest Travel
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Sign in to your account
+          </p>
         </div>
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
             {error}
           </div>
         )}
@@ -76,7 +127,7 @@ const Login = () => {
               onChange={handleChange}
               required
               placeholder="you@example.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
             />
           </div>
 
@@ -91,25 +142,33 @@ const Login = () => {
               onChange={handleChange}
               required
               placeholder="Enter your password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-teal-700 hover:bg-teal-800 disabled:bg-blue-300 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+            className="w-full bg-teal-700 hover:bg-teal-800 disabled:bg-teal-300 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
+        {/* MFA info */}
+        <div className="mt-4 bg-teal-50 border border-teal-100 rounded-lg px-4 py-3">
+          <p className="text-teal-700 text-xs text-center">
+            If you have MFA enabled you will be asked to
+            verify your identity after signing in
+          </p>
+        </div>
+
         {/* Register link */}
         <p className="text-center text-gray-600 mt-6">
-          Don't have an account?{" "}
+          Do not have an account?{" "}
           <Link
             to="/register"
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="text-teal-600 hover:text-teal-800 font-medium"
           >
             Create one
           </Link>
