@@ -16,6 +16,7 @@ import Home                from "./pages/Home";
 import OTPVerify           from "./pages/OTPVerify";
 import SetupTOTP           from "./pages/SetupTOTP";
 import DisableTOTP         from "./pages/DisableTOTP";
+import Profile             from "./pages/Profile";
 
 function App() {
   return (
@@ -53,6 +54,9 @@ function App() {
             }/>
             <Route path="/disable-totp" element={
               <ProtectedRoute><DisableTOTP /></ProtectedRoute>
+            }/>
+            <Route path="/profile" element={
+              <ProtectedRoute><Profile /></ProtectedRoute>
             }/>
 
             {/* ── Admin only ─────────────────────────────────── */}

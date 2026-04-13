@@ -67,9 +67,12 @@ const Navbar = () => {
                 )}
 
                 <div className="flex items-center space-x-3">
-                  <span className="text-teal-200 text-sm">
-                    👤 {user?.full_name}
-                  </span>
+                   <Link
+                    to="/profile"
+                    className="text-teal-200 text-sm hover:text-white transition-colors"
+>
+                   👤 {user?.full_name}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
