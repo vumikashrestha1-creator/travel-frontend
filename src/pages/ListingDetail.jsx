@@ -4,6 +4,7 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import StarRating from "../components/StarRating";
 import ReviewCard from "../components/ReviewCard";
+import ExternalBooking from "../components/ExternalBooking";
 
 const ListingDetail = () => {
   const { id } = useParams();
@@ -59,9 +60,7 @@ const ListingDetail = () => {
 
   const fetchAvailability = async () => {
     try {
-      const res = await api.get(
-        "/api/listings/" + id + "/availability/"
-      );
+      const res = await api.get("/api/listings/" + id + "/availability/");
       setAvailability(res.data);
     } catch (error) {
       console.error("Availability error:", error);
@@ -83,14 +82,10 @@ const ListingDetail = () => {
         listing:          id,
         number_of_guests: guests,
       });
-      const newBookingId = res.data.booking
-        ? res.data.booking.id
-        : res.data.id;
+      const newBookingId = res.data.booking ? res.data.booking.id : res.data.id;
       navigate("/payment/" + newBookingId);
     } catch (error) {
-      setMessage(
-        error.response?.data?.error || "Booking failed. Please try again."
-      );
+      setMessage(error.response?.data?.error || "Booking failed. Please try again.");
     } finally {
       setBooking(false);
     }
@@ -194,9 +189,9 @@ const ListingDetail = () => {
   }
 
   const discountedPrice = Number(listing.discounted_price);
-  const totalPrice = (discountedPrice * guests).toFixed(2);
-  const percentBooked = availability ? availability.percent_booked : 0;
-  const barWidth = (100 - percentBooked) + "%";
+  const totalPrice      = (discountedPrice * guests).toFixed(2);
+  const percentBooked   = availability ? availability.percent_booked : 0;
+  const barWidth        = (100 - percentBooked) + "%";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -254,10 +249,7 @@ const ListingDetail = () => {
               : "bg-red-50 border border-red-200 text-red-700")
           }>
             <span>{message}</span>
-            <button
-              onClick={() => setMessage("")}
-              className="ml-4 text-sm underline"
-            >
+            <button onClick={() => setMessage("")} className="ml-4 text-sm underline">
               dismiss
             </button>
           </div>
@@ -265,25 +257,19 @@ const ListingDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Left Column */}
+          {/* ── Left Column ─────────────────────────────────────── */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Rating Summary */}
             {totalRev > 0 && (
               <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                  Guest Ratings
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Guest Ratings</h2>
                 <div className="flex items-center gap-6">
                   <div className="text-center shrink-0">
                     <p className="text-5xl font-bold text-teal-700">
                       {Number(avgRating).toFixed(1)}
                     </p>
-                    <StarRating
-                      rating={avgRating}
-                      size="md"
-                      showNumber={false}
-                    />
+                    <StarRating rating={avgRating} size="md" showNumber={false} />
                     <p className="text-sm text-gray-400 mt-1">
                       {totalRev} review{totalRev !== 1 ? "s" : ""}
                     </p>
@@ -291,18 +277,13 @@ const ListingDetail = () => {
                   <div className="flex-1 space-y-2">
                     {[5, 4, 3, 2, 1].map((star) => {
                       const count = breakdown[star + "_star"] || 0;
-                      const pct = totalRev > 0
-                        ? Math.round((count / totalRev) * 100)
-                        : 0;
+                      const pct   = totalRev > 0 ? Math.round((count / totalRev) * 100) : 0;
                       return (
                         <div key={star} className="flex items-center gap-2 text-sm">
                           <span className="text-gray-500 w-4">{star}</span>
                           <span className="text-yellow-400">★</span>
                           <div className="flex-1 bg-gray-100 rounded-full h-2">
-                            <div
-                              className="bg-yellow-400 h-2 rounded-full"
-                              style={{ width: pct + "%" }}
-                            />
+                            <div className="bg-yellow-400 h-2 rounded-full" style={{ width: pct + "%" }} />
                           </div>
                           <span className="text-gray-400 w-4">{count}</span>
                         </div>
@@ -315,49 +296,32 @@ const ListingDetail = () => {
 
             {/* About */}
             <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                About This Package
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {listing.description}
-              </p>
-
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">About This Package</h2>
+              <p className="text-gray-600 leading-relaxed">{listing.description}</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
                 <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
                   <p className="text-xl mb-1">⏱</p>
                   <p className="text-xs text-gray-400">Duration</p>
-                  <p className="font-semibold text-gray-800 text-sm mt-1">
-                    {listing.duration_days} days
-                  </p>
+                  <p className="font-semibold text-gray-800 text-sm mt-1">{listing.duration_days} days</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
                   <p className="text-xl mb-1">📅</p>
                   <p className="text-xs text-gray-400">Start Date</p>
-                  <p className="font-semibold text-gray-800 text-sm mt-1">
-                    {listing.start_date}
-                  </p>
+                  <p className="font-semibold text-gray-800 text-sm mt-1">{listing.start_date}</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
                   <p className="text-xl mb-1">🏁</p>
                   <p className="text-xs text-gray-400">End Date</p>
-                  <p className="font-semibold text-gray-800 text-sm mt-1">
-                    {listing.end_date}
-                  </p>
+                  <p className="font-semibold text-gray-800 text-sm mt-1">{listing.end_date}</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
                   <p className="text-xl mb-1">💺</p>
                   <p className="text-xs text-gray-400">Seats Left</p>
-                  <p className={
-                    "font-semibold text-sm mt-1 " +
-                    getSeatsColor(listing.available_seats)
-                  }>
-                    {listing.available_seats > 0
-                      ? listing.available_seats
-                      : "Sold Out"}
+                  <p className={"font-semibold text-sm mt-1 " + getSeatsColor(listing.available_seats)}>
+                    {listing.available_seats > 0 ? listing.available_seats : "Sold Out"}
                   </p>
                 </div>
               </div>
-
               <div className="flex flex-wrap gap-2 mt-4">
                 {listing.includes_hotel && (
                   <span className="bg-teal-50 text-teal-700 border border-teal-100 px-3 py-1 rounded-full text-sm font-medium">
@@ -399,69 +363,41 @@ const ListingDetail = () => {
               </div>
 
               {showReviewForm && (
-                <form
-                  onSubmit={handleSubmitReview}
-                  className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200"
-                >
-                  <h3 className="font-semibold text-gray-800 mb-4">
-                    Share Your Experience
-                  </h3>
+                <form onSubmit={handleSubmitReview} className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
+                  <h3 className="font-semibold text-gray-800 mb-4">Share Your Experience</h3>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Rating
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
                           type="button"
-                          onClick={() =>
-                            setReviewData({ ...reviewData, rating: star })
-                          }
-                          className={
-                            "text-3xl transition-all hover:scale-110 " +
-                            (star <= reviewData.rating
-                              ? "text-yellow-400"
-                              : "text-gray-300")
-                          }
+                          onClick={() => setReviewData({ ...reviewData, rating: star })}
+                          className={"text-3xl transition-all hover:scale-110 " + (star <= reviewData.rating ? "text-yellow-400" : "text-gray-300")}
                         >
                           ★
                         </button>
                       ))}
-                      <span className="ml-2 text-gray-500 text-sm">
-                        {reviewData.rating} out of 5
-                      </span>
+                      <span className="ml-2 text-gray-500 text-sm">{reviewData.rating} out of 5</span>
                     </div>
                   </div>
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Review Title
-                      <span className="text-gray-400 font-normal ml-1">
-                        (optional)
-                      </span>
+                      Review Title <span className="text-gray-400 font-normal ml-1">(optional)</span>
                     </label>
                     <input
                       type="text"
                       value={reviewData.title}
-                      onChange={(e) =>
-                        setReviewData({ ...reviewData, title: e.target.value })
-                      }
+                      onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
                       placeholder="Summarise your experience"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Your Comment
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
                     <textarea
                       value={reviewData.comment}
-                      onChange={(e) =>
-                        setReviewData({
-                          ...reviewData,
-                          comment: e.target.value,
-                        })
-                      }
+                      onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
                       rows={4}
                       placeholder="Share your experience with other travellers..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 resize-none"
@@ -488,9 +424,7 @@ const ListingDetail = () => {
 
               {!isLoggedIn && (
                 <div className="bg-teal-50 border border-teal-100 rounded-lg p-4 mb-4 text-center">
-                  <p className="text-teal-700 text-sm">
-                    Please login to write a review
-                  </p>
+                  <p className="text-teal-700 text-sm">Please login to write a review</p>
                 </div>
               )}
 
@@ -498,9 +432,7 @@ const ListingDetail = () => {
                 <div className="text-center py-10">
                   <p className="text-4xl mb-3">💬</p>
                   <p className="text-gray-400 font-medium">No reviews yet</p>
-                  <p className="text-gray-300 text-sm mt-1">
-                    Be the first to share your experience!
-                  </p>
+                  <p className="text-gray-300 text-sm mt-1">Be the first to share your experience!</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -517,22 +449,20 @@ const ListingDetail = () => {
             </div>
           </div>
 
-          {/* Right Column — Booking Card */}
+          {/* ── Right Column ─────────────────────────────────────── */}
           <div className="lg:col-span-1">
+
+            {/* Booking Card */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sticky top-4">
 
               {/* Price */}
               <div className="mb-4">
                 {listing.discount_percent > 0 && (
-                  <p className="text-sm text-gray-400 line-through">
-                    ${listing.price_per_person} per person
-                  </p>
+                  <p className="text-sm text-gray-400 line-through">${listing.price_per_person} per person</p>
                 )}
                 <p className="text-3xl font-bold text-teal-700">
                   ${discountedPrice}
-                  <span className="text-base font-normal text-gray-400">
-                    /person
-                  </span>
+                  <span className="text-base font-normal text-gray-400">/person</span>
                 </p>
                 {listing.discount_percent > 0 && (
                   <span className="inline-block mt-1 bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full font-medium">
@@ -541,34 +471,21 @@ const ListingDetail = () => {
                 )}
               </div>
 
-              {/* Availability Section */}
+              {/* Availability */}
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-500">Availability</span>
-                  <span className={
-                    "font-medium " +
-                    getSeatsColor(listing.available_seats)
-                  }>
-                    {listing.available_seats > 0
-                      ? listing.available_seats + " seats left"
-                      : "Sold Out"}
+                  <span className={"font-medium " + getSeatsColor(listing.available_seats)}>
+                    {listing.available_seats > 0 ? listing.available_seats + " seats left" : "Sold Out"}
                   </span>
                 </div>
-
-                {/* Progress bar */}
                 <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
                   <div
-                    className={
-                      "h-2 rounded-full transition-all " +
-                      getBarColor(listing.available_seats)
-                    }
+                    className={"h-2 rounded-full transition-all " + getBarColor(listing.available_seats)}
                     style={{ width: barWidth }}
                   />
                 </div>
-
-                {/* Urgency message */}
-                {listing.available_seats > 0 &&
-                  listing.available_seats <= 5 && (
+                {listing.available_seats > 0 && listing.available_seats <= 5 && (
                   <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
                     <p className="text-orange-600 text-xs font-bold">
                       Only {listing.available_seats} seats left — book now!
@@ -581,9 +498,7 @@ const ListingDetail = () => {
               {listing.is_available ? (
                 <div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Guests
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
                     <input
                       type="number"
                       min="1"
@@ -598,19 +513,11 @@ const ListingDetail = () => {
                       </p>
                     )}
                   </div>
-
                   <div className="bg-teal-50 rounded-xl p-4 mb-4 text-center border border-teal-100">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">
-                      Total Price
-                    </p>
-                    <p className="text-2xl font-bold text-teal-700 mt-1">
-                      ${totalPrice}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      for {guests} guest{guests !== 1 ? "s" : ""}
-                    </p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Total Price</p>
+                    <p className="text-2xl font-bold text-teal-700 mt-1">${totalPrice}</p>
+                    <p className="text-xs text-gray-400 mt-1">for {guests} guest{guests !== 1 ? "s" : ""}</p>
                   </div>
-
                   <button
                     onClick={handleBook}
                     disabled={booking || guests > listing.available_seats}
@@ -618,20 +525,15 @@ const ListingDetail = () => {
                   >
                     {booking ? "Booking..." : "Book Now"}
                   </button>
-
                   {!isLoggedIn && (
-                    <p className="text-center text-xs text-gray-400 mt-3">
-                      Login to complete booking
-                    </p>
+                    <p className="text-center text-xs text-gray-400 mt-3">Login to complete booking</p>
                   )}
                 </div>
               ) : (
                 <div className="bg-red-50 border border-red-100 rounded-xl p-5 text-center">
                   <p className="text-2xl mb-2">😔</p>
                   <p className="text-red-600 font-semibold">Fully Booked</p>
-                  <p className="text-red-400 text-sm mt-1">
-                    No seats available for this package
-                  </p>
+                  <p className="text-red-400 text-sm mt-1">No seats available for this package</p>
                 </div>
               )}
 
@@ -639,47 +541,31 @@ const ListingDetail = () => {
               <div className="border-t border-gray-100 mt-5 pt-5 space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">Destination</span>
-                  <span className="font-medium text-gray-700">
-                    {listing.destination}
-                  </span>
+                  <span className="font-medium text-gray-700">{listing.destination}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">Country</span>
-                  <span className="font-medium text-gray-700">
-                    {listing.country}
-                  </span>
+                  <span className="font-medium text-gray-700">{listing.country}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">Departure</span>
-                  <span className="font-medium text-gray-700">
-                    {listing.start_date}
-                  </span>
+                  <span className="font-medium text-gray-700">{listing.start_date}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">Return</span>
-                  <span className="font-medium text-gray-700">
-                    {listing.end_date}
-                  </span>
+                  <span className="font-medium text-gray-700">{listing.end_date}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-400">Duration</span>
-                  <span className="font-medium text-gray-700">
-                    {listing.duration_days} days
-                  </span>
+                  <span className="font-medium text-gray-700">{listing.duration_days} days</span>
                 </div>
               </div>
 
               {avgRating > 0 && (
                 <div className="border-t border-gray-100 mt-4 pt-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">
-                      Guest Rating
-                    </span>
-                    <StarRating
-                      rating={avgRating}
-                      size="sm"
-                      showNumber={true}
-                    />
+                    <span className="text-sm text-gray-400">Guest Rating</span>
+                    <StarRating rating={avgRating} size="sm" showNumber={true} />
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
                     Based on {totalRev} review{totalRev !== 1 ? "s" : ""}
@@ -687,6 +573,10 @@ const ListingDetail = () => {
                 </div>
               )}
             </div>
+
+            {/* ── External Booking Platforms ──────────────────── */}
+            <ExternalBooking listing={listing} />
+
           </div>
         </div>
       </div>
