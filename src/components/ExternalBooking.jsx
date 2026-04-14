@@ -6,7 +6,6 @@ const ExternalBooking = ({ listing }) => {
   const cout = listing.end_date || "";
   const type = listing.listing_type;
 
-  // Use exact URL if available, otherwise fall back to search
   const hotelButtons = [
     {
       href:  listing.booking_com_url || "https://www.booking.com/search.html?ss=" + dest + "&checkin=" + cin + "&checkout=" + cout,
