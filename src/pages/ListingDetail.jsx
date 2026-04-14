@@ -452,131 +452,135 @@ const ListingDetail = () => {
           {/* ── Right Column ─────────────────────────────────────── */}
           <div className="lg:col-span-1">
 
-            {/* Booking Card */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sticky top-4">
+            {/* ── Sticky wrapper for BOTH booking card + external links ── */}
+            <div className="sticky top-4 space-y-4">
 
-              {/* Price */}
-              <div className="mb-4">
-                {listing.discount_percent > 0 && (
-                  <p className="text-sm text-gray-400 line-through">${listing.price_per_person} per person</p>
-                )}
-                <p className="text-3xl font-bold text-teal-700">
-                  ${discountedPrice}
-                  <span className="text-base font-normal text-gray-400">/person</span>
-                </p>
-                {listing.discount_percent > 0 && (
-                  <span className="inline-block mt-1 bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full font-medium">
-                    Save {listing.discount_percent}%
-                  </span>
-                )}
-              </div>
+              {/* Booking Card */}
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
 
-              {/* Availability */}
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-500">Availability</span>
-                  <span className={"font-medium " + getSeatsColor(listing.available_seats)}>
-                    {listing.available_seats > 0 ? listing.available_seats + " seats left" : "Sold Out"}
-                  </span>
+                {/* Price */}
+                <div className="mb-4">
+                  {listing.discount_percent > 0 && (
+                    <p className="text-sm text-gray-400 line-through">${listing.price_per_person} per person</p>
+                  )}
+                  <p className="text-3xl font-bold text-teal-700">
+                    ${discountedPrice}
+                    <span className="text-base font-normal text-gray-400">/person</span>
+                  </p>
+                  {listing.discount_percent > 0 && (
+                    <span className="inline-block mt-1 bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full font-medium">
+                      Save {listing.discount_percent}%
+                    </span>
+                  )}
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
-                  <div
-                    className={"h-2 rounded-full transition-all " + getBarColor(listing.available_seats)}
-                    style={{ width: barWidth }}
-                  />
+
+                {/* Availability */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-500">Availability</span>
+                    <span className={"font-medium " + getSeatsColor(listing.available_seats)}>
+                      {listing.available_seats > 0 ? listing.available_seats + " seats left" : "Sold Out"}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
+                    <div
+                      className={"h-2 rounded-full transition-all " + getBarColor(listing.available_seats)}
+                      style={{ width: barWidth }}
+                    />
+                  </div>
+                  {listing.available_seats > 0 && listing.available_seats <= 5 && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
+                      <p className="text-orange-600 text-xs font-bold">
+                        Only {listing.available_seats} seats left — book now!
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {listing.available_seats > 0 && listing.available_seats <= 5 && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-center">
-                    <p className="text-orange-600 text-xs font-bold">
-                      Only {listing.available_seats} seats left — book now!
+
+                {/* Booking form or sold out */}
+                {listing.is_available ? (
+                  <div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max={listing.available_seats}
+                        value={guests}
+                        onChange={handleGuestChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-teal-500 text-center text-lg font-semibold"
+                      />
+                      {guests > listing.available_seats && (
+                        <p className="text-red-500 text-xs mt-1 text-center">
+                          Maximum {listing.available_seats} guests allowed
+                        </p>
+                      )}
+                    </div>
+                    <div className="bg-teal-50 rounded-xl p-4 mb-4 text-center border border-teal-100">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Total Price</p>
+                      <p className="text-2xl font-bold text-teal-700 mt-1">${totalPrice}</p>
+                      <p className="text-xs text-gray-400 mt-1">for {guests} guest{guests !== 1 ? "s" : ""}</p>
+                    </div>
+                    <button
+                      onClick={handleBook}
+                      disabled={booking || guests > listing.available_seats}
+                      className="w-full bg-teal-700 text-white py-3 rounded-xl hover:bg-teal-800 transition-colors font-semibold text-lg disabled:bg-teal-300 disabled:cursor-not-allowed"
+                    >
+                      {booking ? "Booking..." : "Book Now"}
+                    </button>
+                    {!isLoggedIn && (
+                      <p className="text-center text-xs text-gray-400 mt-3">Login to complete booking</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-red-50 border border-red-100 rounded-xl p-5 text-center">
+                    <p className="text-2xl mb-2">😔</p>
+                    <p className="text-red-600 font-semibold">Fully Booked</p>
+                    <p className="text-red-400 text-sm mt-1">No seats available for this package</p>
+                  </div>
+                )}
+
+                {/* Quick info */}
+                <div className="border-t border-gray-100 mt-5 pt-5 space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Destination</span>
+                    <span className="font-medium text-gray-700">{listing.destination}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Country</span>
+                    <span className="font-medium text-gray-700">{listing.country}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Departure</span>
+                    <span className="font-medium text-gray-700">{listing.start_date}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Return</span>
+                    <span className="font-medium text-gray-700">{listing.end_date}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Duration</span>
+                    <span className="font-medium text-gray-700">{listing.duration_days} days</span>
+                  </div>
+                </div>
+
+                {avgRating > 0 && (
+                  <div className="border-t border-gray-100 mt-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Guest Rating</span>
+                      <StarRating rating={avgRating} size="sm" showNumber={true} />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Based on {totalRev} review{totalRev !== 1 ? "s" : ""}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Booking form or sold out */}
-              {listing.is_available ? (
-                <div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max={listing.available_seats}
-                      value={guests}
-                      onChange={handleGuestChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-teal-500 text-center text-lg font-semibold"
-                    />
-                    {guests > listing.available_seats && (
-                      <p className="text-red-500 text-xs mt-1 text-center">
-                        Maximum {listing.available_seats} guests allowed
-                      </p>
-                    )}
-                  </div>
-                  <div className="bg-teal-50 rounded-xl p-4 mb-4 text-center border border-teal-100">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">Total Price</p>
-                    <p className="text-2xl font-bold text-teal-700 mt-1">${totalPrice}</p>
-                    <p className="text-xs text-gray-400 mt-1">for {guests} guest{guests !== 1 ? "s" : ""}</p>
-                  </div>
-                  <button
-                    onClick={handleBook}
-                    disabled={booking || guests > listing.available_seats}
-                    className="w-full bg-teal-700 text-white py-3 rounded-xl hover:bg-teal-800 transition-colors font-semibold text-lg disabled:bg-teal-300 disabled:cursor-not-allowed"
-                  >
-                    {booking ? "Booking..." : "Book Now"}
-                  </button>
-                  {!isLoggedIn && (
-                    <p className="text-center text-xs text-gray-400 mt-3">Login to complete booking</p>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-red-50 border border-red-100 rounded-xl p-5 text-center">
-                  <p className="text-2xl mb-2">😔</p>
-                  <p className="text-red-600 font-semibold">Fully Booked</p>
-                  <p className="text-red-400 text-sm mt-1">No seats available for this package</p>
-                </div>
-              )}
+              {/* ── External Booking Platforms ── */}
+              <ExternalBooking listing={listing} />
 
-              {/* Quick info */}
-              <div className="border-t border-gray-100 mt-5 pt-5 space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Destination</span>
-                  <span className="font-medium text-gray-700">{listing.destination}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Country</span>
-                  <span className="font-medium text-gray-700">{listing.country}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Departure</span>
-                  <span className="font-medium text-gray-700">{listing.start_date}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Return</span>
-                  <span className="font-medium text-gray-700">{listing.end_date}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Duration</span>
-                  <span className="font-medium text-gray-700">{listing.duration_days} days</span>
-                </div>
-              </div>
-
-              {avgRating > 0 && (
-                <div className="border-t border-gray-100 mt-4 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Guest Rating</span>
-                    <StarRating rating={avgRating} size="sm" showNumber={true} />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Based on {totalRev} review{totalRev !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              )}
             </div>
-
-            {/* ── External Booking Platforms ──────────────────── */}
-            <ExternalBooking listing={listing} />
-
           </div>
         </div>
       </div>
