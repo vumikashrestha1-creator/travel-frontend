@@ -4,7 +4,7 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import StarRating from "../components/StarRating";
 import FilterBar from "../components/FilterBar";
-import AIRecommend from "../components/AIRecommend";
+import AISearch from "../components/AISearch";
 
 const DEFAULT_FILTERS = {
   search:     "",
@@ -214,7 +214,8 @@ const Listings = () => {
         </div>
 
         {/* ── AI Recommendations ────────────────────────────── */}
-        <AIRecommend />
+        <AISearch />
+
 
         {/* Badge legend */}
         <div className="flex flex-wrap justify-center gap-3 mb-6">
