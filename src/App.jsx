@@ -18,6 +18,7 @@ import SetupTOTP           from "./pages/SetupTOTP";
 import DisableTOTP         from "./pages/DisableTOTP";
 import Profile             from "./pages/Profile";
 import AIChatbot from "./components/AIChatbot";
+import TravelAgentDashboard from "./pages/TravelAgentDashboard";
 
 function App() {
   return (
@@ -68,6 +69,12 @@ function App() {
             {/* ── Default redirects ──────────────────────────── */}
             <Route path="/"  element={<Home />} />
             <Route path="*"  element={<Navigate to="/listings" replace />} />
+
+            {/* Travel Agent Dashboard */}
+            
+            <Route path="/agent-dashboard" element={
+              <ProtectedRoute><TravelAgentDashboard /></ProtectedRoute>
+            }/>
 
           </Routes>
                {/* AI Chatbot — shows on every page */}
