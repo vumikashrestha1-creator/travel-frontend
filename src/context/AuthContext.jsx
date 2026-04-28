@@ -19,8 +19,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // ── Used after OTP or TOTP verification ──────────────────────
-  // Called by OTPVerify.jsx after successful verification
   const loginWithTokens = (userData, tokens) => {
     if (tokens && tokens.access) {
       localStorage.setItem("access_token",  tokens.access);
@@ -30,18 +28,9 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
-  // ── Normal login ──────────────────────────────────────────────
-  // Returns mfa_required: true if MFA is enabled
-  // Returns mfa_required: false if login is complete
   const login = async (email, password) => {
-    const response = await api.post("/api/users/login/", {
-      email,
-      password,
-    });
+    const response = await api.post("/api/users/login/", { email, password });
     const data = response.data;
-
-    // MFA required — return data so Login.jsx can
-    // redirect to OTP verification screen
     if (data.mfa_required) {
       return {
         mfa_required: true,
@@ -51,14 +40,11 @@ export const AuthProvider = ({ children }) => {
         message:      data.message,
       };
     }
-
-    // No MFA — login directly
     const { user, tokens } = data;
     loginWithTokens(user, tokens);
     return { mfa_required: false, user };
   };
 
-  // ── Register ──────────────────────────────────────────────────
   const register = async (userData) => {
     const response = await api.post("/api/users/register/", userData);
     const { user, tokens } = response.data;
@@ -66,7 +52,6 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
-  // ── Logout ────────────────────────────────────────────────────
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
@@ -81,13 +66,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ── Toggle Email OTP MFA ──────────────────────────────────────
-  // userId is only passed by admin toggling another user's MFA
   const toggleMFA = async (userId = null) => {
     const body     = userId ? { user_id: userId } : {};
     const response = await api.post("/api/users/toggle-mfa/", body);
-
-    // Update local user state if toggling own MFA
     if (!userId) {
       const updatedUser = {
         ...user,
@@ -100,7 +81,6 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   };
 
-  // ── Disable MFA for a user (Admin only) ──────────────────────
   const adminDisableMFA = async (userId) => {
     const response = await api.post(
       "/api/users/admin/users/" + userId + "/disable-mfa/"
@@ -119,10 +99,12 @@ export const AuthProvider = ({ children }) => {
         loginWithTokens,
         toggleMFA,
         adminDisableMFA,
-        isAdmin:       user?.role === "ADMIN",
-        isCustomer:    user?.role === "CUSTOMER",
-        isTravelAgent: user?.role === "TRAVEL_AGENT",
-        isLoggedIn:    !!user,
+        isAdmin:          user?.role === "ADMIN",
+        isManager:        user?.role === "MANAGER",
+        isTravelAgent:    user?.role === "TRAVEL_AGENT",
+        isCustomer:       user?.role === "CUSTOMER",
+        isLoggedIn:       !!user,
+        canViewDashboard: user?.role === "ADMIN" || user?.role === "MANAGER",
       }}
     >
       {children}

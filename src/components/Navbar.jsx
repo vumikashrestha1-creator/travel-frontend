@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-  const { user, isLoggedIn, logout, isAdmin } = useAuth();
+  const { user, isLoggedIn, logout, isAdmin, isManager, isTravelAgent } = useAuth();
   const navigate  = useNavigate();
   const location  = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,6 +56,21 @@ const Navbar = () => {
                     Admin
                   </Link>
                 )}
+                {isManager && (
+                  <Link
+                    to="/dashboard"
+                    className="bg-orange-400 text-white px-3 py-1 rounded-full text-sm font-bold hover:bg-orange-500 transition-colors"
+                  >
+                    Manager
+                  </Link>
+                )}
+                
+                {isTravelAgent && (
+                <Link to="/agent-dashboard" className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold hover:bg-blue-600 transition-colors">
+                  Agent
+                </Link>
+              )}
+                
                 <Link
                   to="/profile"
                   className="flex items-center gap-1.5 text-teal-200 hover:text-white text-sm transition-colors"
@@ -139,6 +154,15 @@ const Navbar = () => {
                   className="block bg-yellow-400 text-gray-900 text-sm font-bold py-2 px-3 rounded-lg mb-2"
                 >
                   ⚙️ Admin Dashboard
+                </Link>
+              )}
+              {isManager && (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="block bg-orange-400 text-white text-sm font-bold py-2 px-3 rounded-lg mb-2"
+                >
+                  📊 Manager Dashboard
                 </Link>
               )}
               <button
