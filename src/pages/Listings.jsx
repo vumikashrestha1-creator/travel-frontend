@@ -214,7 +214,7 @@ const Listings = () => {
               className="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none text-sm bg-white shadow-sm"
             />
           </div>
-          <button
+          {/* <button
             onClick={() => setShowFilter(!showFilter)}
             className={
               "px-4 py-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-2 shadow-sm " +
@@ -225,25 +225,24 @@ const Listings = () => {
             {hasActiveFilters && (
               <span className="bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">!</span>
             )}
-          </button>
-          {hasActiveFilters && (
+          </button> */}
+          {/* {hasActiveFilters && (
             <button
               onClick={handleReset}
               className="px-4 py-3 rounded-xl border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors shadow-sm"
             >
               Reset
             </button>
-          )}
+          )} */}
         </div>
 
         <div className="flex gap-6">
-          {/* Filter sidebar */}
-          {showFilter && (
-            <div className="w-64 shrink-0">
-              <FilterBar filters={filters} onFilterChange={setFilters} onReset={handleReset} />
-            </div>
-          )}
+          {/* Filter sidebar — always visible */}
+          <div className="w-64 shrink-0">
+            <FilterBar filters={filters} onFilterChange={setFilters} onReset={handleReset} />
+          </div>
 
+          
           {/* Main content */}
           <div className="flex-1 min-w-0">
             {/* Results + sort */}
