@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 const AdminDashboard = () => {
   const [activeTab,   setActiveTab]   = useState("overview");
@@ -238,7 +239,8 @@ const AdminDashboard = () => {
               { key: "overview", label: "📊 Overview"  },
               { key: "users",    label: "👥 Users"     },
               { key: "bookings", label: "📋 Bookings"  },
-              { key: "listings", label: "🌍 Listings"  },
+              { key: "listings",  label: "🌍 Listings"  },
+{ key: "analytics", label: "📈 Analytics" },
             ].map(({ key, label }) => (
               <button key={key} onClick={() => setActiveTab(key)} className={tabClass(key)}>
                 {label}
@@ -467,6 +469,65 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ANALYTICS TAB */}
+                {activeTab === "analytics" && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-6">📈 Analytics Overview</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                        <h3 className="font-semibold text-gray-700 mb-4">Booking Status</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie data={[
+                              { name: "Confirmed", value: bookings.filter(b => b.status === "CONFIRMED").length },
+                              { name: "Pending",   value: bookings.filter(b => b.status === "PENDING").length   },
+                              { name: "Cancelled", value: bookings.filter(b => b.status === "CANCELLED").length },
+                              { name: "Completed", value: bookings.filter(b => b.status === "COMPLETED").length },
+                            ]} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
+                              {["#0d9488","#f59e0b","#ef4444","#3b82f6"].map((color, i) => <Cell key={i} fill={color} />)}
+                            </Pie>
+                            <Tooltip /><Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                        <h3 className="font-semibold text-gray-700 mb-4">Top Destinations</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                          <BarChart data={listings.slice(0,5).map(l => ({ name: l.destination || l.title?.slice(0,10), seats: l.max_seats - l.available_seats }))}>
+                            <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis />
+                            <Tooltip /><Bar dataKey="seats" fill="#0d9488" name="Bookings" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                        <h3 className="font-semibold text-gray-700 mb-4">Revenue by Listing</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                          <BarChart data={listings.slice(0,5).map(l => ({ name: l.destination || l.title?.slice(0,10), revenue: l.price_per_person * (l.max_seats - l.available_seats) }))}>
+                            <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis />
+                            <Tooltip /><Bar dataKey="revenue" fill="#6366f1" name="Revenue ($)" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                        <h3 className="font-semibold text-gray-700 mb-4">User Roles</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie data={[
+                              { name: "Customer",     value: users.filter(u => u.role === "CUSTOMER").length     },
+                              { name: "Admin",        value: users.filter(u => u.role === "ADMIN").length        },
+                              { name: "Travel Agent", value: users.filter(u => u.role === "TRAVEL_AGENT").length },
+                              { name: "Manager",      value: users.filter(u => u.role === "MANAGER").length      },
+                            ]} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
+                              {["#0d9488","#3b82f6","#8b5cf6","#f59e0b"].map((color, i) => <Cell key={i} fill={color} />)}
+                            </Pie>
+                            <Tooltip /><Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
                     </div>
                   </div>
                 )}
