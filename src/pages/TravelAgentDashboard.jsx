@@ -3,6 +3,45 @@ import { useNavigate }         from "react-router-dom";
 import { useAuth }             from "../context/AuthContext";
 import api                     from "../api/axios";
 
+// Country → Cities mapping
+const COUNTRY_CITIES = {
+  "Australia":    ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"],
+  "Japan":        ["Tokyo", "Osaka", "Kyoto", "Hiroshima", "Sapporo"],
+  "Indonesia":    ["Bali", "Jakarta", "Lombok", "Yogyakarta"],
+  "Thailand":     ["Bangkok", "Phuket", "Chiang Mai", "Koh Samui"],
+  "Nepal":        ["Kathmandu", "Pokhara", "Chitwan", "Lumbini"],
+  "Singapore":    ["Singapore"],
+  "UAE":          ["Dubai", "Abu Dhabi", "Sharjah"],
+  "France":       ["Paris", "Lyon", "Nice", "Marseille"],
+  "Italy":        ["Rome", "Milan", "Venice", "Florence", "Naples"],
+  "Spain":        ["Barcelona", "Madrid", "Seville", "Valencia"],
+  "UK":           ["London", "Edinburgh", "Manchester", "Liverpool"],
+  "Netherlands":  ["Amsterdam", "Rotterdam", "The Hague"],
+  "USA":          ["New York", "Los Angeles", "Las Vegas", "Miami", "Chicago"],
+  "New Zealand":  ["Queenstown", "Auckland", "Christchurch", "Wellington"],
+  "Mexico":       ["Cancun", "Mexico City", "Tulum", "Playa del Carmen"],
+  "India":        ["Mumbai", "Delhi", "Goa", "Jaipur", "Agra"],
+  "Sri Lanka":    ["Colombo", "Kandy", "Galle", "Sigiriya"],
+  "Maldives":     ["Male", "Maafushi", "Hulhumale"],
+  "Greece":       ["Athens", "Santorini", "Mykonos", "Rhodes"],
+  "Turkey":       ["Istanbul", "Antalya", "Cappadocia", "Bodrum"],
+};
+
+const DESTINATIONS = [
+  { group: "🌏 Asia Pacific",
+    options: ["Bali, Indonesia", "Tokyo, Japan", "Bangkok, Thailand", "Singapore",
+              "Kathmandu, Nepal", "Dubai, UAE", "Maldives", "Goa, India",
+              "Colombo, Sri Lanka", "Phuket, Thailand", "Kyoto, Japan", "Osaka, Japan"] },
+  { group: "🌍 Europe",
+    options: ["Paris, France", "Rome, Italy", "Barcelona, Spain", "London, UK",
+              "Amsterdam, Netherlands", "Athens, Greece", "Santorini, Greece",
+              "Istanbul, Turkey", "Venice, Italy", "Madrid, Spain"] },
+  { group: "🌎 Americas & Pacific",
+    options: ["New York, USA", "Sydney, Australia", "Melbourne, Australia",
+              "Queenstown, New Zealand", "Cancun, Mexico", "Los Angeles, USA",
+              "Miami, USA", "Las Vegas, USA", "Auckland, New Zealand"] },
+];
+
 const TravelAgentDashboard = () => {
   const { user }   = useAuth();
   const navigate   = useNavigate();
@@ -122,6 +161,9 @@ const TravelAgentDashboard = () => {
     };
     return `px-2 py-1 rounded-full text-xs font-medium ${styles[s] || "bg-gray-100 text-gray-700"}`;
   };
+
+  const selectClass = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500";
+  const inputClass  = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -290,77 +332,214 @@ const TravelAgentDashboard = () => {
 
                         {/* Form fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {[
-                            { name:"title",            label:"Title",            type:"text"   },
-                            { name:"origin",           label:"Origin",           type:"text"   },
-                            { name:"destination",      label:"Destination",      type:"text"   },
-                            { name:"country",          label:"Country",          type:"text"   },
-                            { name:"city",             label:"City",             type:"text"   },
-                            { name:"price_per_person", label:"Price Per Person", type:"number" },
-                            { name:"discount_percent", label:"Discount %",       type:"number" },
-                            { name:"available_seats",  label:"Available Seats",  type:"number" },
-                            { name:"max_seats",        label:"Max Seats",        type:"number" },
-                            { name:"duration_days",    label:"Duration (days)",  type:"number" },
-                            { name:"start_date",       label:"Start Date",       type:"date"   },
-                            { name:"end_date",         label:"End Date",         type:"date"   },
-                          ].map(({ name, label, type }) => (
-                            <div key={name}>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                              <input
-                                type={type}
-                                required
-                                value={newListing[name]}
-                                onChange={(e) => setNewListing({ ...newListing, [name]: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                          ))}
 
+                          {/* Title */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input type="text" required value={newListing.title}
+                              onChange={(e) => setNewListing({ ...newListing, title: e.target.value })}
+                              className={inputClass} />
+                          </div>
+
+                          {/* Origin */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Origin</label>
+                            <input type="text" required value={newListing.origin}
+                              onChange={(e) => setNewListing({ ...newListing, origin: e.target.value })}
+                              placeholder="e.g. Sydney"
+                              className={inputClass} />
+                          </div>
+
+                          {/* Destination — DROPDOWN */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                            <select required value={newListing.destination}
+                              onChange={(e) => setNewListing({ ...newListing, destination: e.target.value })}
+                              className={selectClass}>
+                              <option value="">— Select Destination —</option>
+                              {DESTINATIONS.map(({ group, options }) => (
+                                <optgroup key={group} label={group}>
+                                  {options.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                  ))}
+                                </optgroup>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Country — DROPDOWN */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                            <select required value={newListing.country}
+                              onChange={(e) => setNewListing({ ...newListing, country: e.target.value, city: "" })}
+                              className={selectClass}>
+                              <option value="">— Select Country —</option>
+                              {Object.keys(COUNTRY_CITIES).sort().map(c => (
+                                <option key={c} value={c}>{c}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* City — DROPDOWN (depends on country) */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                            <select required value={newListing.city}
+                              onChange={(e) => setNewListing({ ...newListing, city: e.target.value })}
+                              className={selectClass}
+                              disabled={!newListing.country}>
+                              <option value="">
+                                {newListing.country ? "— Select City —" : "— Select a country first —"}
+                              </option>
+                              {(COUNTRY_CITIES[newListing.country] || []).map(city => (
+                                <option key={city} value={city}>{city}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Price Per Person */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Person</label>
+                            <input type="number" required min="1" step="0.01" value={newListing.price_per_person}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "" || Number(val) >= 1) setNewListing({ ...newListing, price_per_person: val });
+                              }}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 1) setNewListing({ ...newListing, price_per_person: "1" });
+                              }}
+                              placeholder="e.g. 1500"
+                              className={inputClass} />
+                            {newListing.price_per_person && Number(newListing.price_per_person) < 1 && (
+                              <p className="text-red-500 text-xs mt-1">⚠️ Price must be at least $1</p>
+                            )}
+                          </div>
+
+                          {/* Discount % */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                            <input type="number" required min="0" max="100" value={newListing.discount_percent}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "" || (Number(val) >= 0 && Number(val) <= 100)) setNewListing({ ...newListing, discount_percent: val });
+                              }}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 0) setNewListing({ ...newListing, discount_percent: "0" });
+                                if (Number(e.target.value) > 100) setNewListing({ ...newListing, discount_percent: "100" });
+                              }}
+                              placeholder="0"
+                              className={inputClass} />
+                            {newListing.discount_percent && (Number(newListing.discount_percent) < 0 || Number(newListing.discount_percent) > 100) && (
+                              <p className="text-red-500 text-xs mt-1">⚠️ Discount must be between 0 and 100</p>
+                            )}
+                          </div>
+
+                          {/* Available Seats */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Available Seats</label>
+                            <input type="number" required min="1" value={newListing.available_seats}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "" || Number(val) >= 1) setNewListing({ ...newListing, available_seats: val });
+                              }}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 1) setNewListing({ ...newListing, available_seats: "1" });
+                              }}
+                              placeholder="e.g. 20"
+                              className={inputClass} />
+                            {newListing.available_seats && Number(newListing.available_seats) < 1 && (
+                              <p className="text-red-500 text-xs mt-1">⚠️ Must be at least 1 seat</p>
+                            )}
+                          </div>
+
+                          {/* Max Seats */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Max Seats</label>
+                            <input type="number" required min="1" value={newListing.max_seats}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "" || Number(val) >= 1) setNewListing({ ...newListing, max_seats: val });
+                              }}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 1) setNewListing({ ...newListing, max_seats: "1" });
+                              }}
+                              placeholder="e.g. 50"
+                              className={inputClass} />
+                            {newListing.max_seats && Number(newListing.max_seats) < 1 && (
+                              <p className="text-red-500 text-xs mt-1">⚠️ Must be at least 1 seat</p>
+                            )}
+                          </div>
+
+                          {/* Duration */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
+                            <input type="number" required min="1" value={newListing.duration_days}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "" || Number(val) >= 1) setNewListing({ ...newListing, duration_days: val });
+                              }}
+                              onBlur={(e) => {
+                                if (Number(e.target.value) < 1) setNewListing({ ...newListing, duration_days: "1" });
+                              }}
+                              placeholder="e.g. 7"
+                              className={inputClass} />
+                            {newListing.duration_days && Number(newListing.duration_days) < 1 && (
+                              <p className="text-red-500 text-xs mt-1">⚠️ Duration must be at least 1 day</p>
+                            )}
+                          </div>
+
+                          {/* Start Date */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" required value={newListing.start_date}
+                              onChange={(e) => setNewListing({ ...newListing, start_date: e.target.value })}
+                              className={inputClass} />
+                          </div>
+
+                          {/* End Date */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" required value={newListing.end_date}
+                              onChange={(e) => setNewListing({ ...newListing, end_date: e.target.value })}
+                              className={inputClass} />
+                          </div>
+
+                          {/* Image URL */}
                           <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Image URL <span className="text-gray-400 font-normal">(optional)</span>
                             </label>
-                            <input
-                              type="url"
-                              value={newListing.image_url}
+                            <input type="url" value={newListing.image_url}
                               onChange={(e) => setNewListing({ ...newListing, image_url: e.target.value })}
                               placeholder="https://images.unsplash.com/photo-..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                              className={inputClass} />
                             {newListing.image_url && (
-                              <img
-                                src={newListing.image_url}
-                                alt="Preview"
+                              <img src={newListing.image_url} alt="Preview"
                                 className="mt-2 h-24 w-40 object-cover rounded-lg border border-gray-200"
-                                onError={(e) => { e.target.style.display = "none"; }}
-                              />
+                                onError={(e) => { e.target.style.display = "none"; }} />
                             )}
                           </div>
 
+                          {/* Description */}
                           <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea
-                              required
-                              value={newListing.description}
+                            <textarea required value={newListing.description}
                               onChange={(e) => setNewListing({ ...newListing, description: e.target.value })}
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                              rows={3} className={inputClass} />
                           </div>
 
+                          {/* Listing Type */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Listing Type</label>
-                            <select
-                              value={newListing.listing_type}
+                            <select value={newListing.listing_type}
                               onChange={(e) => setNewListing({ ...newListing, listing_type: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
-                            >
+                              className={selectClass}>
                               <option value="PACKAGE">Package</option>
                               <option value="HOTEL">Hotel</option>
                               <option value="FLIGHT">Flight</option>
                             </select>
                           </div>
 
+                          {/* Includes checkboxes */}
                           <div className="flex items-center gap-6 pt-6">
                             {[
                               { name:"includes_hotel",  label:"Hotel"  },
@@ -368,22 +547,17 @@ const TravelAgentDashboard = () => {
                               { name:"includes_meals",  label:"Meals"  },
                             ].map(({ name, label }) => (
                               <label key={name} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={newListing[name]}
+                                <input type="checkbox" checked={newListing[name]}
                                   onChange={(e) => setNewListing({ ...newListing, [name]: e.target.checked })}
-                                  className="w-4 h-4 accent-blue-600"
-                                />
+                                  className="w-4 h-4 accent-blue-600" />
                                 {label}
                               </label>
                             ))}
                           </div>
                         </div>
 
-                        <button
-                          type="submit"
-                          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                        >
+                        <button type="submit"
+                          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                           Create Listing
                         </button>
                       </form>
@@ -401,12 +575,9 @@ const TravelAgentDashboard = () => {
                         <div key={l.id} className="border border-gray-100 rounded-xl p-4 flex flex-col sm:flex-row justify-between gap-3">
                           <div className="flex gap-4 items-start">
                             {l.image_url ? (
-                              <img
-                                src={l.image_url}
-                                alt={l.title}
+                              <img src={l.image_url} alt={l.title}
                                 className="w-16 h-16 object-cover rounded-lg shrink-0"
-                                onError={(e) => { e.target.style.display = "none"; }}
-                              />
+                                onError={(e) => { e.target.style.display = "none"; }} />
                             ) : (
                               <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                                 <span className="text-2xl">
@@ -428,17 +599,13 @@ const TravelAgentDashboard = () => {
                             </div>
                           </div>
                           <div className="flex gap-3 self-start shrink-0">
-                            <button
-                              onClick={() => navigate("/listings/" + l.id)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
+                            <button onClick={() => navigate("/listings/" + l.id)}
+                              className="text-blue-600 hover:text-blue-800 text-sm font-medium">
                               View
                             </button>
                             {l.status === "ACTIVE" && (
-                              <button
-                                onClick={() => handleDeactivateListing(l.id)}
-                                className="text-red-600 hover:text-red-800 text-sm font-medium"
-                              >
+                              <button onClick={() => handleDeactivateListing(l.id)}
+                                className="text-red-600 hover:text-red-800 text-sm font-medium">
                                 Deactivate
                               </button>
                             )}
