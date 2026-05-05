@@ -56,6 +56,16 @@ const Bookings = () => {
     return styles[status] || "bg-gray-100 text-gray-700";
   };
 
+  const handleReschedule = (bookingId) => {
+    const newDate = prompt("Enter new travel date YYYY-MM-DD");
+
+    if (!newDate) return;
+
+    alert("Reschedule request submitted for booking " + bookingId + " to " + newDate);
+  };
+
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,6 +175,14 @@ const Bookings = () => {
                     >
                       Cancel Booking
                     </button>
+
+                    <button
+                      onClick={() => handleReschedule(booking.id)}
+                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg mt-2"
+                    >
+                      Reschedule Booking
+                    </button>
+
                   )}
                 </div>
               </div>
