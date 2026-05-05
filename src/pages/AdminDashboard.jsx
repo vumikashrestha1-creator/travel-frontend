@@ -2,6 +2,99 @@ import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
+// ── Country list A-Z ──────────────────────────────────────────────
+const COUNTRIES = [
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia",
+  "Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium",
+  "Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei",
+  "Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde",
+  "Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica",
+  "Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominican Republic","Ecuador",
+  "Egypt","El Salvador","Estonia","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia",
+  "Germany","Ghana","Greece","Guatemala","Guinea","Haiti","Honduras","Hungary","Iceland","India",
+  "Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan",
+  "Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Libya","Liechtenstein",
+  "Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania",
+  "Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar",
+  "Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea",
+  "North Macedonia","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay",
+  "Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saudi Arabia",
+  "Senegal","Serbia","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia","South Africa",
+  "South Korea","Spain","Sri Lanka","Sudan","Sweden","Switzerland","Syria","Taiwan","Tajikistan",
+  "Tanzania","Thailand","Timor-Leste","Togo","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan",
+  "Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan",
+  "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+];
+
+// ── Popular destinations ──────────────────────────────────────────
+const DESTINATIONS = [
+  "Bali","Bangkok","Barcelona","Beijing","Berlin","Bucharest","Budapest","Cairo","Cancun",
+  "Cape Town","Copenhagen","Dubai","Edinburgh","Florence","Hong Kong","Istanbul","Jakarta",
+  "Kathmandu","Kuala Lumpur","Lisbon","London","Los Angeles","Maldives","Marrakech","Melbourne",
+  "Mexico City","Milan","Mumbai","Munich","New York","Osaka","Paris","Phuket","Prague","Queenstown",
+  "Reykjavik","Rio de Janeiro","Rome","Santorini","Seoul","Singapore","Sydney","Taipei","Tokyo",
+  "Toronto","Vancouver","Venice","Vienna","Zurich"
+];
+
+// ── Cities by country ─────────────────────────────────────────────
+const CITIES_BY_COUNTRY = {
+  "Australia":       ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Gold Coast","Canberra","Hobart"],
+  "Japan":           ["Tokyo","Osaka","Kyoto","Hiroshima","Sapporo","Fukuoka","Nagoya","Nara"],
+  "Indonesia":       ["Bali","Jakarta","Yogyakarta","Surabaya","Lombok","Medan","Makassar"],
+  "Thailand":        ["Bangkok","Phuket","Chiang Mai","Pattaya","Krabi","Koh Samui","Hua Hin"],
+  "France":          ["Paris","Lyon","Marseille","Nice","Bordeaux","Strasbourg","Toulouse"],
+  "Italy":           ["Rome","Milan","Florence","Venice","Naples","Turin","Amalfi","Positano"],
+  "United Kingdom":  ["London","Edinburgh","Manchester","Birmingham","Liverpool","Bath","Oxford"],
+  "United States":   ["New York","Los Angeles","Las Vegas","Miami","Chicago","San Francisco","Hawaii"],
+  "United Arab Emirates": ["Dubai","Abu Dhabi","Sharjah","Ajman"],
+  "Singapore":       ["Singapore"],
+  "Malaysia":        ["Kuala Lumpur","Penang","Langkawi","Kota Kinabalu","Johor Bahru"],
+  "India":           ["Mumbai","Delhi","Goa","Jaipur","Agra","Bangalore","Chennai","Kolkata"],
+  "China":           ["Beijing","Shanghai","Hong Kong","Guangzhou","Chengdu","Xi an","Hangzhou"],
+  "Germany":         ["Berlin","Munich","Frankfurt","Hamburg","Cologne","Stuttgart","Dresden"],
+  "Spain":           ["Barcelona","Madrid","Seville","Valencia","Ibiza","Mallorca","Granada"],
+  "Greece":          ["Athens","Santorini","Mykonos","Rhodes","Corfu","Thessaloniki","Crete"],
+  "Turkey":          ["Istanbul","Cappadocia","Antalya","Bodrum","Izmir","Ankara","Trabzon"],
+  "Maldives":        ["Male","Maafushi","Hulhumale","Addu City"],
+  "New Zealand":     ["Auckland","Queenstown","Christchurch","Wellington","Rotorua","Dunedin"],
+  "South Africa":    ["Cape Town","Johannesburg","Durban","Pretoria","Stellenbosch","Kruger"],
+  "Brazil":          ["Rio de Janeiro","Sao Paulo","Salvador","Fortaleza","Brasilia","Manaus"],
+  "Canada":          ["Toronto","Vancouver","Montreal","Calgary","Ottawa","Quebec City","Banff"],
+  "Vietnam":         ["Hanoi","Ho Chi Minh City","Da Nang","Hoi An","Nha Trang","Hue","Halong Bay"],
+  "Nepal":           ["Kathmandu","Pokhara","Chitwan","Lukla","Namche Bazaar"],
+  "Portugal":        ["Lisbon","Porto","Algarve","Sintra","Madeira","Azores","Cascais"],
+  "Morocco":         ["Marrakech","Casablanca","Fez","Rabat","Chefchaouen","Essaouira"],
+  "Egypt":           ["Cairo","Luxor","Aswan","Alexandria","Sharm el-Sheikh","Hurghada"],
+  "Mexico":          ["Mexico City","Cancun","Playa del Carmen","Los Cabos","Oaxaca","Guadalajara"],
+  "Peru":            ["Lima","Cusco","Machu Picchu","Arequipa","Iquitos","Puno"],
+  "Argentina":       ["Buenos Aires","Patagonia","Mendoza","Cordoba","Bariloche","Salta"],
+  "Philippines":     ["Manila","Cebu","Boracay","Palawan","Davao","Bohol"],
+  "Sri Lanka":       ["Colombo","Kandy","Galle","Sigiriya","Nuwara Eliya","Trincomalee"],
+  "Cambodia":        ["Siem Reap","Phnom Penh","Sihanoukville","Kampot"],
+  "Iceland":         ["Reykjavik","Akureyri","Vik","Selfoss","Husavik"],
+  "Norway":          ["Oslo","Bergen","Tromso","Stavanger","Trondheim","Flam"],
+  "Switzerland":     ["Zurich","Geneva","Bern","Lucerne","Interlaken","Zermatt"],
+  "Austria":         ["Vienna","Salzburg","Innsbruck","Hallstatt","Graz","Linz"],
+  "Czech Republic":  ["Prague","Brno","Cesky Krumlov","Karlovy Vary"],
+  "Hungary":         ["Budapest","Debrecen","Pecs","Eger","Miskolc"],
+  "Netherlands":     ["Amsterdam","Rotterdam","The Hague","Utrecht","Bruges"],
+  "Belgium":         ["Brussels","Bruges","Ghent","Antwerp","Liege"],
+  "Sweden":          ["Stockholm","Gothenburg","Malmo","Uppsala","Kiruna"],
+  "Denmark":         ["Copenhagen","Aarhus","Odense","Aalborg","Roskilde"],
+  "Finland":         ["Helsinki","Rovaniemi","Turku","Tampere","Oulu"],
+  "Russia":          ["Moscow","Saint Petersburg","Vladivostok","Kazan","Sochi"],
+  "South Korea":     ["Seoul","Busan","Jeju","Incheon","Gyeongju","Suwon"],
+  "Taiwan":          ["Taipei","Kaohsiung","Taichung","Tainan","Hualien"],
+  "Kenya":           ["Nairobi","Mombasa","Masai Mara","Amboseli","Lake Nakuru"],
+  "Tanzania":        ["Dar es Salaam","Zanzibar","Serengeti","Kilimanjaro","Arusha"],
+  "Jordan":          ["Amman","Petra","Wadi Rum","Aqaba","Dead Sea"],
+  "Israel":          ["Jerusalem","Tel Aviv","Haifa","Eilat","Nazareth"],
+  "Saudi Arabia":    ["Riyadh","Jeddah","Mecca","Medina","AlUla","NEOM"],
+  "Qatar":           ["Doha","Al Wakra","Al Khor"],
+  "Bahrain":         ["Manama","Muharraq","Riffa"],
+  "Kuwait":          ["Kuwait City","Ahmadi","Hawalli"],
+};
+
 const AdminDashboard = () => {
   const [activeTab,   setActiveTab]   = useState("overview");
   const [users,       setUsers]       = useState([]);
@@ -11,14 +104,15 @@ const AdminDashboard = () => {
   const [loading,     setLoading]     = useState(false);
   const [message,     setMessage]     = useState("");
 
-  // Add Listing form state
   const [showForm,        setShowForm]        = useState(false);
   const [autofillDest,    setAutofillDest]    = useState("");
   const [autofillLoading, setAutofillLoading] = useState(false);
   const [autofillMsg,     setAutofillMsg]     = useState("");
+  const [formErrors,      setFormErrors]      = useState({});
+
   const [newListing, setNewListing] = useState({
     title: "", description: "", listing_type: "PACKAGE",
-    origin: "", destination: "", country: "", city: "",
+    origin: "Sydney", destination: "", country: "", city: "",
     price_per_person: "", discount_percent: "0",
     available_seats: "", max_seats: "",
     start_date: "", end_date: "", duration_days: "",
@@ -26,16 +120,17 @@ const AdminDashboard = () => {
     includes_flight: false, includes_meals: false,
   });
 
-  // Add User form state
   const [showUserForm, setShowUserForm] = useState(false);
   const [newUser, setNewUser] = useState({
     email: "", first_name: "", last_name: "",
     password: "", role: "CUSTOMER",
   });
 
-  // Edit User role state
   const [editingUserId,   setEditingUserId]   = useState(null);
   const [editingUserRole, setEditingUserRole] = useState("");
+
+  // Get cities based on selected country
+  const availableCities = CITIES_BY_COUNTRY[newListing.country] || [];
 
   useEffect(() => { fetchData(); }, [activeTab]);
 
@@ -65,7 +160,29 @@ const AdminDashboard = () => {
     }
   };
 
-  // AI Autofill
+  // Validate listing form
+  const validateListing = () => {
+    const errors = {};
+    if (!newListing.title.trim())            errors.title            = "Title is required";
+    if (!newListing.destination.trim())      errors.destination      = "Destination is required";
+    if (!newListing.country)                 errors.country          = "Please select a country";
+    if (!newListing.city.trim())             errors.city             = "City is required";
+    if (!newListing.origin.trim())           errors.origin           = "Origin is required";
+    if (!newListing.price_per_person)        errors.price_per_person = "Price is required";
+    if (Number(newListing.price_per_person) <= 0) errors.price_per_person = "Price must be greater than 0";
+    if (!newListing.available_seats)         errors.available_seats  = "Available seats is required";
+    if (!newListing.max_seats)               errors.max_seats        = "Max seats is required";
+    if (Number(newListing.available_seats) > Number(newListing.max_seats))
+      errors.available_seats = "Available seats cannot exceed max seats";
+    if (!newListing.duration_days)           errors.duration_days    = "Duration is required";
+    if (!newListing.start_date)              errors.start_date       = "Start date is required";
+    if (!newListing.end_date)               errors.end_date         = "End date is required";
+    if (newListing.start_date && newListing.end_date && newListing.end_date <= newListing.start_date)
+      errors.end_date = "End date must be after start date";
+    if (!newListing.description.trim())      errors.description      = "Description is required";
+    return errors;
+  };
+
   const handleAutofill = async () => {
     if (!autofillDest.trim()) { setAutofillMsg("Please type a destination first."); return; }
     setAutofillLoading(true);
@@ -86,17 +203,23 @@ const AdminDashboard = () => {
         end_date: d.end_date || "", includes_hotel: d.includes_hotel || false,
         includes_flight: d.includes_flight || false, includes_meals: d.includes_meals || false,
       });
-      setAutofillMsg("✅ All fields filled! Please review and adjust before saving.");
+      setFormErrors({});
+      setAutofillMsg("All fields filled! Please review and adjust before saving.");
     } catch (err) {
-      setAutofillMsg("❌ Autofill failed. Please fill in the fields manually.");
+      setAutofillMsg("Autofill failed. Please fill in the fields manually.");
     } finally {
       setAutofillLoading(false);
     }
   };
 
-  // Create Listing
   const handleCreateListing = async (e) => {
     e.preventDefault();
+    const errors = validateListing();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    setFormErrors({});
     try {
       await api.post("/api/listings/create/", newListing);
       setMessage("Listing created successfully.");
@@ -104,7 +227,7 @@ const AdminDashboard = () => {
       setAutofillDest(""); setAutofillMsg("");
       setNewListing({
         title: "", description: "", listing_type: "PACKAGE",
-        origin: "", destination: "", country: "", city: "",
+        origin: "Sydney", destination: "", country: "", city: "",
         price_per_person: "", discount_percent: "0",
         available_seats: "", max_seats: "", start_date: "", end_date: "",
         duration_days: "", image_url: "", includes_hotel: false,
@@ -116,17 +239,15 @@ const AdminDashboard = () => {
     }
   };
 
-  // Deactivate Listing
   const handleDeactivateListing = async (listingId) => {
     if (!window.confirm("Deactivate this listing?")) return;
     try {
-      await api.delete(`/api/listings/${listingId}/manage/`);
+      await api.delete("/api/listings/" + listingId + "/manage/");
       setMessage("Listing deactivated.");
       fetchData();
     } catch (error) { setMessage("Failed to deactivate listing."); }
   };
 
-  // Create User
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
@@ -140,10 +261,9 @@ const AdminDashboard = () => {
     }
   };
 
-  // Update User Role
   const handleUpdateRole = async (userId) => {
     try {
-      await api.patch(`/api/users/admin/users/${userId}/role/`, { role: editingUserRole });
+      await api.patch("/api/users/admin/users/" + userId + "/role/", { role: editingUserRole });
       setMessage("User role updated successfully.");
       setEditingUserId(null);
       fetchData();
@@ -152,99 +272,89 @@ const AdminDashboard = () => {
     }
   };
 
-  // Deactivate User
   const handleDeactivateUser = async (userId) => {
     if (!window.confirm("Deactivate this user?")) return;
     try {
-      await api.delete(`/api/users/admin/users/${userId}/`);
+      await api.delete("/api/users/admin/users/" + userId + "/");
       setMessage("User deactivated successfully.");
       fetchData();
     } catch (error) { setMessage("Failed to deactivate user."); }
   };
 
-  // Reactivate User
   const handleReactivateUser = async (userId) => {
     try {
-      await api.patch(`/api/users/admin/users/${userId}/`);
+      await api.patch("/api/users/admin/users/" + userId + "/");
       setMessage("User reactivated successfully.");
       fetchData();
     } catch (error) { setMessage("Failed to reactivate user."); }
   };
 
-  // Update Booking Status
   const handleUpdateBooking = async (bookingId, newStatus) => {
     try {
-      await api.patch(`/api/bookings/admin/${bookingId}/update/`, { status: newStatus });
+      await api.patch("/api/bookings/admin/" + bookingId + "/update/", { status: newStatus });
       setMessage("Booking updated successfully.");
       fetchData();
     } catch (error) { setMessage("Failed to update booking."); }
   };
 
   const tabClass = (tab) =>
-    `px-6 py-3 font-medium text-sm transition-colors cursor-pointer ${
-      activeTab === tab
-        ? "border-b-2 border-teal-600 text-teal-600"
-        : "text-gray-500 hover:text-gray-700"
-    }`;
+    "px-6 py-3 font-medium text-sm transition-colors cursor-pointer " +
+    (activeTab === tab ? "border-b-2 border-teal-600 text-teal-600" : "text-gray-500 hover:text-gray-700");
 
   const statusBadge = (s) => {
     const styles = {
-      CONFIRMED: "bg-green-100 text-green-700",
-      PENDING:   "bg-yellow-100 text-yellow-700",
-      CANCELLED: "bg-red-100 text-red-700",
-      COMPLETED: "bg-blue-100 text-blue-700",
-      ACTIVE:    "bg-green-100 text-green-700",
-      INACTIVE:  "bg-gray-100 text-gray-700",
-      SOLDOUT:   "bg-red-100 text-red-700",
+      CONFIRMED: "bg-green-100 text-green-700", PENDING: "bg-yellow-100 text-yellow-700",
+      CANCELLED: "bg-red-100 text-red-700", COMPLETED: "bg-blue-100 text-blue-700",
+      ACTIVE: "bg-green-100 text-green-700", INACTIVE: "bg-gray-100 text-gray-700",
+      SOLDOUT: "bg-red-100 text-red-700",
     };
-    return `px-2 py-1 rounded-full text-xs font-medium ${styles[s] || "bg-gray-100 text-gray-700"}`;
+    return "px-2 py-1 rounded-full text-xs font-medium " + (styles[s] || "bg-gray-100 text-gray-700");
   };
 
   const roleBadge = (role) => {
     const styles = {
-      ADMIN:        "bg-blue-100 text-blue-700",
-      TRAVEL_AGENT: "bg-purple-100 text-purple-700",
-      MANAGER:      "bg-orange-100 text-orange-700",
-      CUSTOMER:     "bg-green-100 text-green-700",
+      ADMIN: "bg-blue-100 text-blue-700", TRAVEL_AGENT: "bg-purple-100 text-purple-700",
+      MANAGER: "bg-orange-100 text-orange-700", CUSTOMER: "bg-green-100 text-green-700",
     };
-    return `px-2 py-1 rounded-full text-xs font-medium ${styles[role] || "bg-gray-100 text-gray-700"}`;
+    return "px-2 py-1 rounded-full text-xs font-medium " + (styles[role] || "bg-gray-100 text-gray-700");
   };
+
+  // Error message component
+  const FieldError = ({ name }) => formErrors[name]
+    ? <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>
+    : null;
+
+  // Input class with error highlight
+  const inputClass = (name) =>
+    "w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 " +
+    (formErrors[name] ? "border-red-400 bg-red-50" : "border-gray-300");
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* Header */}
         <div className="bg-gradient-to-r from-teal-800 to-teal-600 rounded-2xl p-8 text-white mb-8">
-          <h1 className="text-3xl font-bold mb-1">Admin Dashboard 🛡️</h1>
-          <p className="text-teal-200">SafeNest Travel — Full system control and management</p>
+          <h1 className="text-3xl font-bold mb-1">Admin Dashboard</h1>
+          <p className="text-teal-200">SafeNest Travel - Full system control and management</p>
         </div>
 
-        {/* Message */}
         {message && (
-          <div className={`mb-6 px-4 py-3 rounded-lg ${
-            message.includes("successfully") || message.includes("created")
-              ? "bg-green-50 border border-green-200 text-green-700"
-              : "bg-red-50 border border-red-200 text-red-700"
-          }`}>
+          <div className={"mb-6 px-4 py-3 rounded-lg " + (message.includes("successfully") || message.includes("created") ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700")}>
             {message}
             <button onClick={() => setMessage("")} className="ml-4 text-sm underline">dismiss</button>
           </div>
         )}
 
-        {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
           <div className="flex border-b border-gray-200 overflow-x-auto">
             {[
-              { key: "overview", label: "📊 Overview"  },
-              { key: "users",    label: "👥 Users"     },
-              { key: "bookings", label: "📋 Bookings"  },
-              { key: "listings",  label: "🌍 Listings"  },
-{ key: "analytics", label: "📈 Analytics" },
+              { key: "overview",  label: "Overview"  },
+              { key: "users",     label: "Users"     },
+              { key: "bookings",  label: "Bookings"  },
+              { key: "listings",  label: "Listings"  },
+              { key: "analytics", label: "Analytics" },
             ].map(({ key, label }) => (
-              <button key={key} onClick={() => setActiveTab(key)} className={tabClass(key)}>
-                {label}
-              </button>
+              <button key={key} onClick={() => setActiveTab(key)} className={tabClass(key)}>{label}</button>
             ))}
           </div>
 
@@ -256,7 +366,6 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <>
-                {/* OVERVIEW TAB */}
                 {activeTab === "overview" && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-6">System Overview</h2>
@@ -288,48 +397,32 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* USERS TAB */}
                 {activeTab === "users" && (
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">All Users ({users.length})</h2>
-                      <button
-                        onClick={() => setShowUserForm(!showUserForm)}
-                        className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors"
-                      >
+                      <button onClick={() => setShowUserForm(!showUserForm)} className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors">
                         {showUserForm ? "Cancel" : "+ Add User"}
                       </button>
                     </div>
-
-                    {/* ADD USER FORM */}
                     {showUserForm && (
                       <form onSubmit={handleCreateUser} className="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
                         <h3 className="font-semibold text-gray-800 mb-4">Create New User</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {[
-                            { name:"email",      label:"Email",      type:"email"    },
-                            { name:"first_name", label:"First Name", type:"text"     },
-                            { name:"last_name",  label:"Last Name",  type:"text"     },
-                            { name:"password",   label:"Password",   type:"password" },
+                            { name:"email", label:"Email", type:"email" },
+                            { name:"first_name", label:"First Name", type:"text" },
+                            { name:"last_name", label:"Last Name", type:"text" },
+                            { name:"password", label:"Password", type:"password" },
                           ].map(({ name, label, type }) => (
                             <div key={name}>
                               <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                              <input
-                                type={type}
-                                required
-                                value={newUser[name]}
-                                onChange={(e) => setNewUser({ ...newUser, [name]: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
-                              />
+                              <input type={type} required value={newUser[name]} onChange={(e) => setNewUser({ ...newUser, [name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500" />
                             </div>
                           ))}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                            <select
-                              value={newUser.role}
-                              onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
-                            >
+                            <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none">
                               <option value="CUSTOMER">Customer</option>
                               <option value="MANAGER">Manager</option>
                               <option value="TRAVEL_AGENT">Travel Agent</option>
@@ -337,32 +430,9 @@ const AdminDashboard = () => {
                             </select>
                           </div>
                         </div>
-
-                        {/* Role descriptions */}
-                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {[
-                            { role:"CUSTOMER",     color:"green",  desc:"Can browse and book listings" },
-                            { role:"MANAGER",      color:"orange", desc:"Can view bookings and dashboard only" },
-                            { role:"TRAVEL_AGENT", color:"purple", desc:"Can create and manage listings" },
-                            { role:"ADMIN",        color:"blue",   desc:"Full system access" },
-                          ].map(({ role, color, desc }) => (
-                            <div key={role} className={`p-3 rounded-lg border border-${color}-200 bg-${color}-50`}>
-                              <p className={`text-xs font-bold text-${color}-700 mb-1`}>{role}</p>
-                              <p className={`text-xs text-${color}-600`}>{desc}</p>
-                            </div>
-                          ))}
-                        </div>
-
-                        <button
-                          type="submit"
-                          className="mt-4 bg-teal-700 text-white px-6 py-2 rounded-lg hover:bg-teal-800 transition-colors font-medium text-sm"
-                        >
-                          Create User
-                        </button>
+                        <button type="submit" className="mt-4 bg-teal-700 text-white px-6 py-2 rounded-lg hover:bg-teal-800 transition-colors font-medium text-sm">Create User</button>
                       </form>
                     )}
-
-                    {/* Users table */}
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
@@ -380,11 +450,7 @@ const AdminDashboard = () => {
                               <td className="px-4 py-3">
                                 {editingUserId === user.id ? (
                                   <div className="flex gap-2 items-center">
-                                    <select
-                                      value={editingUserRole}
-                                      onChange={(e) => setEditingUserRole(e.target.value)}
-                                      className="text-xs border border-gray-300 rounded px-2 py-1 outline-none"
-                                    >
+                                    <select value={editingUserRole} onChange={(e) => setEditingUserRole(e.target.value)} className="text-xs border border-gray-300 rounded px-2 py-1 outline-none">
                                       <option value="CUSTOMER">Customer</option>
                                       <option value="MANAGER">Manager</option>
                                       <option value="TRAVEL_AGENT">Travel Agent</option>
@@ -398,31 +464,20 @@ const AdminDashboard = () => {
                                 )}
                               </td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  user.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                }`}>{user.is_active ? "Active" : "Inactive"}</span>
+                                <span className={"px-2 py-1 rounded-full text-xs font-medium " + (user.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>
+                                  {user.is_active ? "Active" : "Inactive"}
+                                </span>
                               </td>
                               <td className="px-4 py-3 text-gray-500">{new Date(user.date_joined).toLocaleDateString()}</td>
                               <td className="px-4 py-3">
                                 <div className="flex gap-2 flex-wrap">
                                   {user.role !== "ADMIN" && (
-                                    <button
-                                      onClick={() => { setEditingUserId(user.id); setEditingUserRole(user.role); }}
-                                      className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                                    >
-                                      Edit Role
-                                    </button>
+                                    <button onClick={() => { setEditingUserId(user.id); setEditingUserRole(user.role); }} className="text-blue-600 hover:text-blue-800 text-xs font-medium">Edit Role</button>
                                   )}
                                   {user.role !== "ADMIN" && (
-                                    user.is_active ? (
-                                      <button onClick={() => handleDeactivateUser(user.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">
-                                        Deactivate
-                                      </button>
-                                    ) : (
-                                      <button onClick={() => handleReactivateUser(user.id)} className="text-green-600 hover:text-green-800 text-xs font-medium">
-                                        Reactivate
-                                      </button>
-                                    )
+                                    user.is_active
+                                      ? <button onClick={() => handleDeactivateUser(user.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">Deactivate</button>
+                                      : <button onClick={() => handleReactivateUser(user.id)} className="text-green-600 hover:text-green-800 text-xs font-medium">Reactivate</button>
                                   )}
                                 </div>
                               </td>
@@ -434,7 +489,6 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* BOOKINGS TAB */}
                 {activeTab === "bookings" && (
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">All Bookings ({bookings.length})</h2>
@@ -455,11 +509,7 @@ const AdminDashboard = () => {
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <select
-                                defaultValue={booking.status}
-                                onChange={(e) => handleUpdateBooking(booking.id, e.target.value)}
-                                className="text-sm border border-gray-200 rounded-lg px-2 py-1 outline-none"
-                              >
+                              <select defaultValue={booking.status} onChange={(e) => handleUpdateBooking(booking.id, e.target.value)} className="text-sm border border-gray-200 rounded-lg px-2 py-1 outline-none">
                                 <option value="PENDING">Pending</option>
                                 <option value="CONFIRMED">Confirmed</option>
                                 <option value="COMPLETED">Completed</option>
@@ -473,10 +523,9 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* ANALYTICS TAB */}
                 {activeTab === "analytics" && (
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-800 mb-6">📈 Analytics Overview</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-6">Analytics Overview</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
                         <h3 className="font-semibold text-gray-700 mb-4">Booking Status</h3>
@@ -532,15 +581,11 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* LISTINGS TAB */}
                 {activeTab === "listings" && (
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">All Listings ({listings.length})</h2>
-                      <button
-                        onClick={() => setShowForm(!showForm)}
-                        className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors"
-                      >
+                      <button onClick={() => setShowForm(!showForm)} className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors">
                         {showForm ? "Cancel" : "+ Add Listing"}
                       </button>
                     </div>
@@ -549,7 +594,7 @@ const AdminDashboard = () => {
                       <form onSubmit={handleCreateListing} className="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
                         <h3 className="font-semibold text-gray-800 mb-4">Create New Listing</h3>
 
-                        {/* AI Autofill box */}
+                        {/* AI Autofill */}
                         <div className="bg-gradient-to-r from-teal-700 to-teal-500 rounded-xl p-5 mb-6">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xl">✨</span>
@@ -557,119 +602,180 @@ const AdminDashboard = () => {
                           </div>
                           <p className="text-teal-100 text-xs mb-4">Type a destination and click Autofill. Gemini fills in all fields automatically.</p>
                           <div className="flex flex-wrap gap-2">
-                            <input
-                              type="text"
-                              value={autofillDest}
-                              onChange={(e) => setAutofillDest(e.target.value)}
-                              onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-                              placeholder="e.g. Bali, Tokyo, Paris..."
-                              className="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm outline-none text-gray-800"
-                            />
-                            <select
-                              value={newListing.listing_type}
-                              onChange={(e) => setNewListing({ ...newListing, listing_type: e.target.value })}
-                              className="px-3 py-2 rounded-lg text-sm outline-none text-gray-800"
-                            >
+                            <input type="text" value={autofillDest} onChange={(e) => setAutofillDest(e.target.value)} onKeyDown={(e) => e.key === "Enter" && e.preventDefault()} placeholder="e.g. Bali, Tokyo, Paris..." className="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm outline-none text-gray-800" />
+                            <select value={newListing.listing_type} onChange={(e) => setNewListing({ ...newListing, listing_type: e.target.value })} className="px-3 py-2 rounded-lg text-sm outline-none text-gray-800">
                               <option value="PACKAGE">Package</option>
                               <option value="HOTEL">Hotel</option>
                               <option value="FLIGHT">Flight</option>
                             </select>
-                            <button
-                              type="button"
-                              onClick={handleAutofill}
-                              disabled={autofillLoading}
-                              className="bg-white text-teal-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-50 transition-colors disabled:opacity-60 whitespace-nowrap"
-                            >
-                              {autofillLoading ? "⏳ Generating..." : "✨ Autofill with AI"}
+                            <button type="button" onClick={handleAutofill} disabled={autofillLoading} className="bg-white text-teal-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-50 transition-colors disabled:opacity-60 whitespace-nowrap">
+                              {autofillLoading ? "Generating..." : "Autofill with AI"}
                             </button>
                           </div>
                           {autofillMsg && (
-                            <p className={`mt-3 text-xs font-medium ${
-                              autofillMsg.includes("✅") ? "text-green-200" :
-                              autofillMsg.includes("❌") ? "text-red-200" : "text-teal-100"
-                            }`}>{autofillMsg}</p>
+                            <p className={"mt-3 text-xs font-medium " + (autofillMsg.includes("filled") ? "text-green-200" : autofillMsg.includes("failed") ? "text-red-200" : "text-teal-100")}>{autofillMsg}</p>
                           )}
                         </div>
 
+                        {/* Validation error summary */}
+                        {Object.keys(formErrors).length > 0 && (
+                          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-red-700 text-sm font-medium">Please fix the following errors:</p>
+                            <ul className="mt-1 space-y-1">
+                              {Object.values(formErrors).map((err, i) => (
+                                <li key={i} className="text-red-600 text-xs">• {err}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {[
-                            { name:"title",            label:"Title",            type:"text"   },
-                            { name:"origin",           label:"Origin",           type:"text"   },
-                            { name:"destination",      label:"Destination",      type:"text"   },
-                            { name:"country",          label:"Country",          type:"text"   },
-                            { name:"city",             label:"City",             type:"text"   },
-                            { name:"price_per_person", label:"Price Per Person", type:"number" },
-                            { name:"discount_percent", label:"Discount %",       type:"number" },
-                            { name:"available_seats",  label:"Available Seats",  type:"number" },
-                            { name:"max_seats",        label:"Max Seats",        type:"number" },
-                            { name:"duration_days",    label:"Duration (days)",  type:"number" },
-                            { name:"start_date",       label:"Start Date",       type:"date"   },
-                            { name:"end_date",         label:"End Date",         type:"date"   },
-                          ].map(({ name, label, type }) => (
-                            <div key={name}>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                              <input
-                                type={type}
-                                required
-                                value={newListing[name]}
-                                onChange={(e) => setNewListing({ ...newListing, [name]: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
-                              />
-                            </div>
-                          ))}
+
+                          {/* Title */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                            <input type="text" value={newListing.title} onChange={(e) => setNewListing({ ...newListing, title: e.target.value })} className={inputClass("title")} placeholder="e.g. Bali Adventure Package" />
+                            <FieldError name="title" />
+                          </div>
+
+                          {/* Origin */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Origin *</label>
+                            <input type="text" value={newListing.origin} onChange={(e) => setNewListing({ ...newListing, origin: e.target.value })} className={inputClass("origin")} placeholder="e.g. Sydney" />
+                            <FieldError name="origin" />
+                          </div>
+
+                          {/* Destination dropdown */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Destination *</label>
+                            <select value={newListing.destination} onChange={(e) => setNewListing({ ...newListing, destination: e.target.value })} className={inputClass("destination")}>
+                              <option value="">-- Select Destination --</option>
+                              {DESTINATIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                              <option value="__other__">Other (type below)</option>
+                            </select>
+                            {newListing.destination === "__other__" && (
+                              <input type="text" placeholder="Type destination name" onChange={(e) => setNewListing({ ...newListing, destination: e.target.value })} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+                            )}
+                            <FieldError name="destination" />
+                          </div>
+
+                          {/* Country dropdown A-Z */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+                            <select
+                              value={newListing.country}
+                              onChange={(e) => setNewListing({ ...newListing, country: e.target.value, city: "" })}
+                              className={inputClass("country")}
+                            >
+                              <option value="">-- Select Country --</option>
+                              {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                            <FieldError name="country" />
+                          </div>
+
+                          {/* City — smart dropdown based on country */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                            {availableCities.length > 0 ? (
+                              <select value={newListing.city} onChange={(e) => setNewListing({ ...newListing, city: e.target.value })} className={inputClass("city")}>
+                                <option value="">-- Select City --</option>
+                                {availableCities.map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                            ) : (
+                              <input type="text" value={newListing.city} onChange={(e) => setNewListing({ ...newListing, city: e.target.value })} className={inputClass("city")} placeholder={newListing.country ? "Type city name" : "Select a country first"} />
+                            )}
+                            <FieldError name="city" />
+                          </div>
+
+                          {/* Price */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Person (USD) *</label>
+                            <input type="number" value={newListing.price_per_person} onChange={(e) => setNewListing({ ...newListing, price_per_person: e.target.value })} className={inputClass("price_per_person")} placeholder="e.g. 1200" min="1" />
+                            <FieldError name="price_per_person" />
+                          </div>
+
+                          {/* Discount */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                            <input type="number" value={newListing.discount_percent} onChange={(e) => setNewListing({ ...newListing, discount_percent: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500" min="0" max="100" />
+                          </div>
+
+                          {/* Available Seats */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Available Seats *</label>
+                            <input type="number" value={newListing.available_seats} onChange={(e) => setNewListing({ ...newListing, available_seats: e.target.value })} className={inputClass("available_seats")} placeholder="e.g. 20" min="1" />
+                            <FieldError name="available_seats" />
+                          </div>
+
+                          {/* Max Seats */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Max Seats *</label>
+                            <input type="number" value={newListing.max_seats} onChange={(e) => setNewListing({ ...newListing, max_seats: e.target.value })} className={inputClass("max_seats")} placeholder="e.g. 20" min="1" />
+                            <FieldError name="max_seats" />
+                          </div>
+
+                          {/* Duration */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (days) *</label>
+                            <input type="number" value={newListing.duration_days} onChange={(e) => setNewListing({ ...newListing, duration_days: e.target.value })} className={inputClass("duration_days")} placeholder="e.g. 7" min="1" />
+                            <FieldError name="duration_days" />
+                          </div>
+
+                          {/* Start Date */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                            <input type="date" value={newListing.start_date} onChange={(e) => setNewListing({ ...newListing, start_date: e.target.value })} className={inputClass("start_date")} />
+                            <FieldError name="start_date" />
+                          </div>
+
+                          {/* End Date */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+                            <input type="date" value={newListing.end_date} onChange={(e) => setNewListing({ ...newListing, end_date: e.target.value })} className={inputClass("end_date")} />
+                            <FieldError name="end_date" />
+                          </div>
+
+                          {/* Image URL */}
                           <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Image URL <span className="text-gray-400 font-normal">(optional)</span></label>
-                            <input
-                              type="url"
-                              value={newListing.image_url}
-                              onChange={(e) => setNewListing({ ...newListing, image_url: e.target.value })}
-                              placeholder="https://images.unsplash.com/photo-..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
-                            />
+                            <input type="url" value={newListing.image_url} onChange={(e) => setNewListing({ ...newListing, image_url: e.target.value })} placeholder="https://images.unsplash.com/photo-..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500" />
                             {newListing.image_url && (
                               <img src={newListing.image_url} alt="Preview" className="mt-2 h-24 w-40 object-cover rounded-lg border border-gray-200" onError={(e) => { e.target.style.display = "none"; }} />
                             )}
                           </div>
+
+                          {/* Description */}
                           <div className="sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea
-                              required
-                              value={newListing.description}
-                              onChange={(e) => setNewListing({ ...newListing, description: e.target.value })}
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500"
-                            />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                            <textarea value={newListing.description} onChange={(e) => setNewListing({ ...newListing, description: e.target.value })} rows={3} className={inputClass("description")} placeholder="Describe the travel package..." />
+                            <FieldError name="description" />
                           </div>
+
+                          {/* Listing Type */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Listing Type</label>
-                            <select
-                              value={newListing.listing_type}
-                              onChange={(e) => setNewListing({ ...newListing, listing_type: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
-                            >
+                            <select value={newListing.listing_type} onChange={(e) => setNewListing({ ...newListing, listing_type: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none">
                               <option value="PACKAGE">Package</option>
                               <option value="HOTEL">Hotel</option>
                               <option value="FLIGHT">Flight</option>
                             </select>
                           </div>
+
+                          {/* Checkboxes */}
                           <div className="flex items-center gap-6 pt-6">
                             {[
-                              { name:"includes_hotel",  label:"Hotel"  },
+                              { name:"includes_hotel", label:"Hotel" },
                               { name:"includes_flight", label:"Flight" },
-                              { name:"includes_meals",  label:"Meals"  },
+                              { name:"includes_meals", label:"Meals" },
                             ].map(({ name, label }) => (
                               <label key={name} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={newListing[name]}
-                                  onChange={(e) => setNewListing({ ...newListing, [name]: e.target.checked })}
-                                  className="w-4 h-4 accent-teal-600"
-                                />
+                                <input type="checkbox" checked={newListing[name]} onChange={(e) => setNewListing({ ...newListing, [name]: e.target.checked })} className="w-4 h-4 accent-teal-600" />
                                 {label}
                               </label>
                             ))}
                           </div>
                         </div>
+
                         <button type="submit" className="mt-6 bg-teal-700 text-white px-6 py-2 rounded-lg hover:bg-teal-800 transition-colors font-medium">
                           Create Listing
                         </button>
@@ -700,9 +806,7 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                           {listing.status === "ACTIVE" && (
-                            <button onClick={() => handleDeactivateListing(listing.id)} className="text-red-600 hover:text-red-800 text-sm font-medium self-start shrink-0">
-                              Deactivate
-                            </button>
+                            <button onClick={() => handleDeactivateListing(listing.id)} className="text-red-600 hover:text-red-800 text-sm font-medium self-start shrink-0">Deactivate</button>
                           )}
                         </div>
                       ))}
