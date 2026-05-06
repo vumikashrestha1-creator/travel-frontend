@@ -3,7 +3,6 @@ import { Link, useNavigate }   from "react-router-dom";
 import { useAuth }             from "../context/AuthContext";
 import api                     from "../api/axios";
 
-// Manager Dashboard — view only
 const ManagerDashboard = ({ user }) => {
   const [bookings,  setBookings]  = useState([]);
   const [users,     setUsers]     = useState([]);
@@ -32,11 +31,8 @@ const ManagerDashboard = ({ user }) => {
   }, []);
 
   const tabClass = (tab) =>
-    `px-5 py-3 font-medium text-sm transition-colors cursor-pointer ${
-      activeTab === tab
-        ? "border-b-2 border-orange-500 text-orange-600"
-        : "text-gray-500 hover:text-gray-700"
-    }`;
+    "px-5 py-3 font-medium text-sm transition-colors cursor-pointer " +
+    (activeTab === tab ? "border-b-2 border-orange-500 text-orange-600" : "text-gray-500 hover:text-gray-700");
 
   const statusBadge = (s) => {
     const styles = {
@@ -47,27 +43,27 @@ const ManagerDashboard = ({ user }) => {
       ACTIVE:    "bg-green-100 text-green-700",
       INACTIVE:  "bg-gray-100 text-gray-700",
     };
-    return `px-2 py-1 rounded-full text-xs font-medium ${styles[s] || "bg-gray-100 text-gray-700"}`;
+    return "px-2 py-1 rounded-full text-xs font-medium " + (styles[s] || "bg-gray-100 text-gray-700");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-gradient-to-r from-orange-600 to-orange-400 rounded-2xl p-8 text-white mb-8">
-          <h1 className="text-3xl font-bold mb-1">Manager Dashboard 📊</h1>
+          <h1 className="text-3xl font-bold mb-1">Manager Dashboard</h1>
           <p className="text-orange-100">Welcome, {user?.full_name} — You have read-only access</p>
           <div className="mt-3 inline-flex items-center gap-2 bg-orange-700 bg-opacity-50 px-3 py-1 rounded-full">
-            <span className="text-xs text-orange-100">🔒 View only — contact an Admin to make changes</span>
+            <span className="text-xs text-orange-100">View only — contact an Admin to make changes</span>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="flex border-b border-gray-200 overflow-x-auto">
             {[
-              { key: "overview", label: "📊 Overview" },
-              { key: "bookings", label: "📋 Bookings" },
-              { key: "users",    label: "👥 Users"    },
-              { key: "listings", label: "🌍 Listings" },
+              { key: "overview", label: "Overview" },
+              { key: "bookings", label: "Bookings" },
+              { key: "users",    label: "Users"    },
+              { key: "listings", label: "Listings" },
             ].map(({ key, label }) => (
               <button key={key} onClick={() => setActiveTab(key)} className={tabClass(key)}>
                 {label}
@@ -88,12 +84,11 @@ const ManagerDashboard = ({ user }) => {
                     <h2 className="text-lg font-semibold text-gray-800 mb-6">System Overview</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                       {[
-                        { label:"Total Users",    value:users.length,    icon:"👥" },
-                        { label:"Total Bookings", value:bookings.length, icon:"📋" },
-                        { label:"Total Listings", value:listings.length, icon:"🌍" },
+                        { label:"Total Users",    value:users.length,    icon:"U" },
+                        { label:"Total Bookings", value:bookings.length, icon:"B" },
+                        { label:"Total Listings", value:listings.length, icon:"L" },
                       ].map(({ label, value, icon }) => (
                         <div key={label} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                          <div className="text-3xl mb-2">{icon}</div>
                           <p className="text-2xl font-bold text-gray-800">{value}</p>
                           <p className="text-sm text-gray-500">{label}</p>
                         </div>
@@ -117,7 +112,7 @@ const ManagerDashboard = ({ user }) => {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">All Bookings ({bookings.length})</h2>
-                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">🔒 View only</span>
+                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">View only</span>
                     </div>
                     <div className="space-y-3">
                       {bookings.map((b) => (
@@ -127,10 +122,10 @@ const ManagerDashboard = ({ user }) => {
                             <span className={statusBadge(b.status)}>{b.status}</span>
                           </div>
                           <div className="text-sm text-gray-500 flex flex-wrap gap-3">
-                            <span>👤 {b.user_email}</span>
-                            <span>🔖 {b.booking_reference}</span>
-                            <span>👥 {b.number_of_guests} guests</span>
-                            <span className="font-semibold text-teal-700">💰 ${b.total_price}</span>
+                            <span>{b.user_email}</span>
+                            <span>{b.booking_reference}</span>
+                            <span>{b.number_of_guests} guests</span>
+                            <span className="font-semibold text-teal-700">${b.total_price}</span>
                           </div>
                         </div>
                       ))}
@@ -142,7 +137,7 @@ const ManagerDashboard = ({ user }) => {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">All Users ({users.length})</h2>
-                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">🔒 View only</span>
+                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">View only</span>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -159,17 +154,17 @@ const ManagerDashboard = ({ user }) => {
                               <td className="px-4 py-3 text-gray-800">{u.email}</td>
                               <td className="px-4 py-3 text-gray-600">{u.first_name} {u.last_name}</td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                <span className={"px-2 py-1 rounded-full text-xs font-medium " + (
                                   u.role === "ADMIN"        ? "bg-blue-100 text-blue-700"     :
                                   u.role === "MANAGER"      ? "bg-orange-100 text-orange-700" :
                                   u.role === "TRAVEL_AGENT" ? "bg-purple-100 text-purple-700" :
                                   "bg-green-100 text-green-700"
-                                }`}>{u.role}</span>
+                                )}>{u.role}</span>
                               </td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                }`}>{u.is_active ? "Active" : "Inactive"}</span>
+                                <span className={"px-2 py-1 rounded-full text-xs font-medium " + (u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>
+                                  {u.is_active ? "Active" : "Inactive"}
+                                </span>
                               </td>
                               <td className="px-4 py-3 text-gray-500">{new Date(u.date_joined).toLocaleDateString()}</td>
                             </tr>
@@ -184,7 +179,7 @@ const ManagerDashboard = ({ user }) => {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">All Listings ({listings.length})</h2>
-                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">🔒 View only</span>
+                      <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">View only</span>
                     </div>
                     <div className="space-y-3">
                       {listings.map((l) => (
@@ -193,7 +188,7 @@ const ManagerDashboard = ({ user }) => {
                             <img src={l.image_url} alt={l.title} className="w-16 h-16 object-cover rounded-lg shrink-0" onError={(e) => { e.target.style.display = "none"; }} />
                           ) : (
                             <div className="w-16 h-16 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
-                              <span className="text-2xl">{l.listing_type === "HOTEL" ? "🏨" : l.listing_type === "FLIGHT" ? "✈️" : "🌴"}</span>
+                              <span className="text-sm font-bold text-teal-700">{l.listing_type}</span>
                             </div>
                           )}
                           <div>
@@ -202,9 +197,9 @@ const ManagerDashboard = ({ user }) => {
                               <span className={statusBadge(l.status)}>{l.status}</span>
                             </div>
                             <div className="text-sm text-gray-500 flex flex-wrap gap-3">
-                              <span>📍 {l.destination}</span>
-                              <span>💰 ${l.discounted_price}/person</span>
-                              <span>💺 {l.available_seats} seats</span>
+                              <span>{l.destination}</span>
+                              <span>${l.discounted_price}/person</span>
+                              <span>{l.available_seats} seats</span>
                             </div>
                           </div>
                         </div>
@@ -221,7 +216,6 @@ const ManagerDashboard = ({ user }) => {
   );
 };
 
-// Main Dashboard
 const Dashboard = () => {
   const { user, toggleMFA, isManager, isTravelAgent } = useAuth();
   const navigate = useNavigate();
@@ -245,23 +239,22 @@ const Dashboard = () => {
     fetchBookings();
   }, []);
 
-  // Show Manager Dashboard
   if (isManager) return <ManagerDashboard user={user} />;
 
-  // Redirect Travel Agent to their dashboard
   if (isTravelAgent) {
     navigate("/agent-dashboard");
     return null;
   }
 
-  // Upcoming trip reminders
-const upcomingReminders = bookings.filter((b) => {
-  if (b.status !== "CONFIRMED") return false;
-  const tripDate = new Date(b.listing_start_date);
-  const today = new Date();
-  const daysLeft = Math.ceil((tripDate - today) / (1000 * 60 * 60 * 24));
-  return daysLeft >= 0 && daysLeft <= 7;
-})
+  // Upcoming trip reminders — fixed with semicolon
+  const upcomingReminders = bookings.filter((b) => {
+    if (b.status !== "CONFIRMED") return false;
+    const tripDate = new Date(b.listing_start_date);
+    const today = new Date();
+    const daysLeft = Math.ceil((tripDate - today) / (1000 * 60 * 60 * 24));
+    return daysLeft >= 0 && daysLeft <= 7;
+  });
+
   const confirmedCount = bookings.filter((b) => b.status === "CONFIRMED").length;
   const pendingCount   = bookings.filter((b) => b.status === "PENDING").length;
   const cancelledCount = bookings.filter((b) => b.status === "CANCELLED").length;
@@ -291,33 +284,34 @@ const upcomingReminders = bookings.filter((b) => {
             <span className="bg-teal-700 px-3 py-1 rounded-full text-sm font-medium">{user?.role}</span>
           </p>
         </div>
-        {/* Booking Reminders */}
-{upcomingReminders.map((b) => {
-  const daysLeft = Math.ceil(
-    (new Date(b.listing_start_date) - new Date()) / (1000 * 60 * 60 * 24)
-  );
-  return (
-    <div key={b.id} className="mb-4 bg-yellow-50 border border-yellow-300 rounded-xl px-5 py-4 flex items-center gap-3">
-      <span className="text-2xl">⏰</span>
-      <div>
-        <p className="font-semibold text-yellow-800">
-          Trip Reminder: {b.listing_title}
-        </p>
-        <p className="text-yellow-700 text-sm">
-          {daysLeft === 0
-            ? "Your trip is TODAY! Have a great journey! 🎉"
-            : `Your trip starts in ${daysLeft} day${daysLeft > 1 ? "s" : ""}! Get ready! ✈️`}
-        </p>
-      </div>
-    </div>
-  );
-})}
+
+        {/* Trip Reminder Banners — Sonika's feature */}
+        {upcomingReminders.map((b) => {
+          const daysLeft = Math.ceil(
+            (new Date(b.listing_start_date) - new Date()) / (1000 * 60 * 60 * 24)
+          );
+          return (
+            <div key={b.id} className="mb-4 bg-yellow-50 border border-yellow-300 rounded-xl px-5 py-4 flex items-center gap-3">
+              <span className="text-2xl">reminder</span>
+              <div>
+                <p className="font-semibold text-yellow-800">
+                  Trip Reminder: {b.listing_title}
+                </p>
+                <p className="text-yellow-700 text-sm">
+                  {daysLeft === 0
+                    ? "Your trip is TODAY! Have a great journey!"
+                    : "Your trip starts in " + daysLeft + " day" + (daysLeft > 1 ? "s" : "") + "! Get ready!"}
+                </p>
+              </div>
+            </div>
+          );
+        })}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[
-            { label:"Confirmed Bookings", value:confirmedCount, icon:"✅" },
-            { label:"Pending Bookings",   value:pendingCount,   icon:"⏳" },
-            { label:"Cancelled",          value:cancelledCount, icon:"❌" },
+            { label:"Confirmed Bookings", value:confirmedCount, icon:"confirmed" },
+            { label:"Pending Bookings",   value:pendingCount,   icon:"pending"   },
+            { label:"Cancelled",          value:cancelledCount, icon:"cancelled" },
           ].map(({ label, value, icon }) => (
             <div key={label} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-center justify-between">
@@ -325,7 +319,6 @@ const upcomingReminders = bookings.filter((b) => {
                   <p className="text-gray-500 text-sm">{label}</p>
                   <p className="text-3xl font-bold text-gray-800 mt-1">{loading ? "..." : value}</p>
                 </div>
-                <span className="text-3xl">{icon}</span>
               </div>
             </div>
           ))}
@@ -333,19 +326,19 @@ const upcomingReminders = bookings.filter((b) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Link to="/listings" className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-teal-300 hover:shadow-md transition-all group">
-            <div className="text-4xl mb-3">🌍</div>
+            <div className="text-4xl mb-3">globe</div>
             <h3 className="text-lg font-semibold text-gray-800 group-hover:text-teal-700">Browse Travel Packages</h3>
             <p className="text-gray-500 text-sm mt-1">Explore available destinations and book your next trip</p>
           </Link>
           <Link to="/bookings" className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-teal-300 hover:shadow-md transition-all group">
-            <div className="text-4xl mb-3">📋</div>
+            <div className="text-4xl mb-3">bookings</div>
             <h3 className="text-lg font-semibold text-gray-800 group-hover:text-teal-700">My Bookings</h3>
             <p className="text-gray-500 text-sm mt-1">View and manage all your travel bookings</p>
           </Link>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">🔐 Two-Factor Authentication</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Two-Factor Authentication</h2>
           {user?.mfa_enabled ? (
             <div>
               <div className="flex items-center gap-3 mb-4">
@@ -376,7 +369,6 @@ const upcomingReminders = bookings.filter((b) => {
               <p className="text-sm text-gray-500 mb-5">Add extra security to your account.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="border-2 border-gray-100 rounded-xl p-5 hover:border-teal-300 transition-all">
-                  <div className="text-3xl mb-3">📧</div>
                   <p className="font-semibold text-gray-800 text-sm mb-1">Email OTP</p>
                   <p className="text-xs text-gray-500 mb-4">Receive a 6-digit code by email each time you log in.</p>
                   <button onClick={handleToggleEmailMFA} disabled={mfaLoading} className="w-full bg-teal-700 text-white py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors font-medium disabled:bg-teal-300">
@@ -384,7 +376,6 @@ const upcomingReminders = bookings.filter((b) => {
                   </button>
                 </div>
                 <div className="border-2 border-gray-100 rounded-xl p-5 hover:border-teal-300 transition-all">
-                  <div className="text-3xl mb-3">📱</div>
                   <p className="font-semibold text-gray-800 text-sm mb-1">Microsoft Authenticator</p>
                   <p className="text-xs text-gray-500 mb-4">Use an app on your phone to generate codes. Works offline.</p>
                   <button onClick={() => navigate("/setup-totp")} className="w-full bg-teal-700 text-white py-2 rounded-lg text-sm hover:bg-teal-800 transition-colors font-medium">
@@ -416,11 +407,11 @@ const upcomingReminders = bookings.filter((b) => {
                     <p className="font-medium text-gray-800">{booking.listing_title}</p>
                     <p className="text-sm text-gray-500">Ref: {booking.booking_reference}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  <span className={"px-3 py-1 rounded-full text-xs font-medium " + (
                     booking.status === "CONFIRMED" ? "bg-green-100 text-green-700" :
                     booking.status === "PENDING"   ? "bg-yellow-100 text-yellow-700" :
                     "bg-red-100 text-red-700"
-                  }`}>{booking.status}</span>
+                  )}>{booking.status}</span>
                 </div>
               ))}
             </div>
