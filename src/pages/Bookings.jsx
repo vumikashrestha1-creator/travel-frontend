@@ -26,7 +26,7 @@ const Bookings = () => {
       return;
     }
     try {
-      await api.post(`/api/bookings/${bookingId}/cancel/`);
+      await api.post("/api/bookings/" + bookingId + "/cancel/");
       setMessage("Booking cancelled successfully.");
       fetchBookings();
     } catch (error) {
@@ -34,6 +34,12 @@ const Bookings = () => {
         error.response?.data?.error || "Cancellation failed. Please try again."
       );
     }
+  };
+
+  const handleReschedule = (bookingId) => {
+    const newDate = prompt("Enter new travel date (YYYY-MM-DD)");
+    if (!newDate) return;
+    alert("Reschedule request submitted for booking " + bookingId + " to " + newDate);
   };
 
   const statusStyle = (status) => {
@@ -56,39 +62,20 @@ const Bookings = () => {
     return styles[status] || "bg-gray-100 text-gray-700";
   };
 
-  const handleReschedule = (bookingId) => {
-    const newDate = prompt("Enter new travel date YYYY-MM-DD");
-
-    if (!newDate) return;
-
-    alert("Reschedule request submitted for booking " + bookingId + " to " + newDate);
-  };
-
-
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* Page title */}
         <h1 className="text-3xl font-bold text-blue-900 mb-8">
-          My Bookings 📋
+          My Bookings
         </h1>
 
-        {/* Success or error message */}
         {message && (
-          <div
-            className={`mb-6 px-4 py-3 rounded-lg ${
-              message.includes("successfully")
-                ? "bg-green-50 border border-green-200 text-green-700"
-                : "bg-red-50 border border-red-200 text-red-700"
-            }`}
-          >
+          <div className={"mb-6 px-4 py-3 rounded-lg " + (message.includes("successfully") ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700")}>
             {message}
           </div>
         )}
 
-        {/* Loading state */}
         {loading ? (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -97,93 +84,72 @@ const Bookings = () => {
 
         ) : bookings.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-            <p className="text-5xl mb-4">📭</p>
+            <p className="text-5xl mb-4">no bookings</p>
             <p className="text-gray-500 text-lg">No bookings yet</p>
           </div>
 
         ) : (
           <div className="space-y-4">
             {bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-              >
+              <div key={booking.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                  {/* Booking details */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <h3 className="font-bold text-gray-800 text-lg">
                         {booking.listing_title}
                       </h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyle(booking.status)}`}
-                      >
+                      <span className={"px-2 py-1 rounded-full text-xs font-medium " + statusStyle(booking.status)}>
                         {booking.status}
                       </span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStyle(booking.payment_status)}`}
-                      >
+                      <span className={"px-2 py-1 rounded-full text-xs font-medium " + paymentStyle(booking.payment_status)}>
                         {booking.payment_status}
                       </span>
                     </div>
 
-                    {/* Info grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                       <div>
                         <p className="font-medium text-gray-500">Reference</p>
-                        <p className="text-gray-800">
-                          {booking.booking_reference}
-                        </p>
+                        <p className="text-gray-800">{booking.booking_reference}</p>
                       </div>
                       <div>
                         <p className="font-medium text-gray-500">Destination</p>
-                        <p className="text-gray-800">
-                          {booking.listing_destination}
-                        </p>
+                        <p className="text-gray-800">{booking.listing_destination}</p>
                       </div>
                       <div>
                         <p className="font-medium text-gray-500">Guests</p>
-                        <p className="text-gray-800">
-                          {booking.number_of_guests} person(s)
-                        </p>
+                        <p className="text-gray-800">{booking.number_of_guests} person(s)</p>
                       </div>
                       <div>
                         <p className="font-medium text-gray-500">Total Price</p>
-                        <p className="font-bold text-blue-900">
-                          ${booking.total_price}
-                        </p>
+                        <p className="font-bold text-blue-900">${booking.total_price}</p>
                       </div>
                     </div>
 
-                    {/* Travel dates */}
                     <div className="mt-3 flex gap-4 text-sm text-gray-500">
-                      <span>
-                        📅 From: {booking.listing_start_date}
-                      </span>
-                      <span>
-                        📅 To: {booking.listing_end_date}
-                      </span>
+                      <span>From: {booking.listing_start_date}</span>
+                      <span>To: {booking.listing_end_date}</span>
                     </div>
                   </div>
 
-                  {/* Cancel button — only for PENDING bookings */}
+                  {/* Action buttons — wrapped in a div so JSX is happy */}
                   {booking.status === "PENDING" && (
-                    <button
-                      onClick={() => handleCancel(booking.id)}
-                      className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0"
-                    >
-                      Cancel Booking
-                    </button>
-
-                    <button
-                      onClick={() => handleReschedule(booking.id)}
-                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg mt-2"
-                    >
-                      Reschedule Booking
-                    </button>
-
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Cancel Booking
+                      </button>
+                      <button
+                        onClick={() => handleReschedule(booking.id)}
+                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Reschedule Booking
+                      </button>
+                    </div>
                   )}
+
                 </div>
               </div>
             ))}
