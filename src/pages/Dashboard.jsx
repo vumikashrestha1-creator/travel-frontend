@@ -254,6 +254,14 @@ const Dashboard = () => {
     return null;
   }
 
+  // Upcoming trip reminders
+const upcomingReminders = bookings.filter((b) => {
+  if (b.status !== "CONFIRMED") return false;
+  const tripDate = new Date(b.listing_start_date);
+  const today = new Date();
+  const daysLeft = Math.ceil((tripDate - today) / (1000 * 60 * 60 * 24));
+  return daysLeft >= 0 && daysLeft <= 7;
+})
   const confirmedCount = bookings.filter((b) => b.status === "CONFIRMED").length;
   const pendingCount   = bookings.filter((b) => b.status === "PENDING").length;
   const cancelledCount = bookings.filter((b) => b.status === "CANCELLED").length;
@@ -283,6 +291,27 @@ const Dashboard = () => {
             <span className="bg-teal-700 px-3 py-1 rounded-full text-sm font-medium">{user?.role}</span>
           </p>
         </div>
+        {/* Booking Reminders */}
+{upcomingReminders.map((b) => {
+  const daysLeft = Math.ceil(
+    (new Date(b.listing_start_date) - new Date()) / (1000 * 60 * 60 * 24)
+  );
+  return (
+    <div key={b.id} className="mb-4 bg-yellow-50 border border-yellow-300 rounded-xl px-5 py-4 flex items-center gap-3">
+      <span className="text-2xl">⏰</span>
+      <div>
+        <p className="font-semibold text-yellow-800">
+          Trip Reminder: {b.listing_title}
+        </p>
+        <p className="text-yellow-700 text-sm">
+          {daysLeft === 0
+            ? "Your trip is TODAY! Have a great journey! 🎉"
+            : `Your trip starts in ${daysLeft} day${daysLeft > 1 ? "s" : ""}! Get ready! ✈️`}
+        </p>
+      </div>
+    </div>
+  );
+})}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[
