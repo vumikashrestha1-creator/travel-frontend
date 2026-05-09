@@ -17,9 +17,11 @@ import OTPVerify           from "./pages/OTPVerify";
 import SetupTOTP           from "./pages/SetupTOTP";
 import DisableTOTP         from "./pages/DisableTOTP";
 import Profile             from "./pages/Profile";
-import AIChatbot from "./components/AIChatbot";
+import AIChatbot           from "./components/AIChatbot";
 import TravelAgentDashboard from "./pages/TravelAgentDashboard";
-import Contact from "./pages/Contact";
+import Contact             from "./pages/Contact";
+import AboutUs             from "./pages/AboutUs";
+import NotFound            from "./pages/NotFound";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="/register"     element={<Register />} />
             <Route path="/listings"     element={<Listings />} />
             <Route path="/listings/:id" element={<ListingDetail />} />
+            <Route path="/contact"      element={<Contact />} />
+            <Route path="/about"        element={<AboutUs />} />
 
             {/* ── MFA verification (public — user not logged in yet) ── */}
             <Route path="/verify-otp"   element={<OTPVerify />} />
@@ -67,20 +71,20 @@ function App() {
               <AdminRoute><AdminDashboard /></AdminRoute>
             }/>
 
-            {/* ── Default redirects ──────────────────────────── */}
-            <Route path="/"  element={<Home />} />
-            <Route path="*"  element={<Navigate to="/listings" replace />} />
-
-            {/* Travel Agent Dashboard */}
-            
+            {/* ── Travel Agent ───────────────────────────────── */}
             <Route path="/agent-dashboard" element={
               <ProtectedRoute><TravelAgentDashboard /></ProtectedRoute>
             }/>
 
-                    <Route path="/contact" element={<Contact />} />
-        </Routes>
-               {/* AI Chatbot — shows on every page */}
+            {/* ── Default & 404 ──────────────────────────────── */}
+            <Route path="/"  element={<Home />} />
+            <Route path="*"  element={<NotFound />} />
+
+          </Routes>
+
+          {/* AI Chatbot — shows on every page */}
           <AIChatbot />
+
         </div>
       </BrowserRouter>
     </AuthProvider>

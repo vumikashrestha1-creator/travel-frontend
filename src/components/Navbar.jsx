@@ -89,6 +89,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
+              <Link to="/about" className="text-cyan-300 hover:text-white transition">About Us</Link>
               <Link to="/contact" className="text-cyan-300 hover:text-white transition">Contact Us</Link>
                 <Link to="/login" className={linkClass("/login")}>Login</Link>
                 <Link
